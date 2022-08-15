@@ -21,7 +21,7 @@ class App {
 
     this.express.use('/', router);
     //  Server creation starts here   
-    const server = isSsl ? http.createServer(this.express) : https.createServer({ key, cert }, this.express);
+    const server = isSsl ? https.createServer({ key, cert }, this.express) : http.createServer(this.express);
 
     socket(server);
 
