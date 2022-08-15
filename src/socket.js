@@ -36,7 +36,7 @@ function removeUser (userid)
 function socket (server)
 {
     const wss = new WebSocket.Server({ server });
-
+    
     wss.on('connection', ws => {
         const userid = uuid();
 
@@ -68,19 +68,15 @@ function socket (server)
             broadcastMsgs();
         };
 
+        const events = {
+            "message": receiveMessage,
+            "setuser": receiveUsername
+        }
+
         ws.on('message', resp => 
         {
             const msg = JSON.parse(resp.toString());
-            switch (msg.type) {
-                case "message":
-                    receiveMessage(msg);
-                    break;
-                case "setuser":
-                    receiveUsername(msg);
-                    break;
-                default:
-                    break;
-            }
+            events (msg.type);
         });
 
         ws.on('close', () => {
