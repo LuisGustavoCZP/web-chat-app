@@ -1,8 +1,9 @@
 const express = require('express');
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 
-const { port } = require('./config');
+const { port, isSsl } = require('./config');
 const router = require('./router');
 const socket = require('./socket');
 
@@ -15,11 +16,12 @@ class App {
     this.express = express();
     const key = fs.readFileSync('./security/key-rsa.pem');
     const cert = fs.readFileSync('./security/cert.pem');
+    
     //  Set up routes (and middlewares if we had any)
 
     this.express.use('/', router);
-    //  Server creation starts here
-    const server = https.createServer({ key, cert }, this.express);     
+    //  Server creation starts here   
+    const server = isSsl ? http.createServer(this.express) : https.createServer({ key, cert }, this.express);
 
     socket(server);
 

@@ -1,41 +1,41 @@
 const { WebSocket } = require('ws');
 const {v4:uuid} = require('uuid');
 
+const msgs = {
+    type: "chat",
+    data: [],
+};
+const users = {};
+
+function addMsg (msg)
+{
+    msgs.data.push(msg);
+}
+
+function broadcastMsgs ()
+{
+    const msgsString = JSON.stringify(msgs);
+    const userslist = Object.values(users);
+    console.log(userslist.length);
+    userslist.forEach(user => 
+    {
+        user.socket.send(msgsString);
+    });
+}
+
+function addUser (userid, data)
+{
+    users[userid] = data;
+}
+
+function removeUser (userid)
+{
+    delete users[userid];
+}
+
 function socket (server)
 {
     const wss = new WebSocket.Server({ server });
-
-    const msgs = {
-        type: "chat",
-        data: [],
-    };
-    const users = {};
-
-    function addMsg (msg)
-    {
-        msgs.data.push(msg);
-    }
-
-    function broadcastMsgs ()
-    {
-        const msgsString = JSON.stringify(msgs);
-        const userslist = Object.values(users);
-        console.log(userslist.length);
-        userslist.forEach(user => 
-        {
-            user.socket.send(msgsString);
-        });
-    }
-
-    function addUser (userid, data)
-    {
-        users[userid] = data;
-    }
-
-    function removeUser (userid)
-    {
-        delete users[userid];
-    }
 
     wss.on('connection', ws => {
         const userid = uuid();
