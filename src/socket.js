@@ -76,7 +76,7 @@ function socket (server)
         ws.on('message', resp => 
         {
             const msg = JSON.parse(resp.toString());
-            events (msg.type);
+            events[msg.type] (msg);
         });
 
         ws.on('close', () => {
