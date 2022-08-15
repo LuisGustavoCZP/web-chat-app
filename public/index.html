@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatão do Alpha</title>
+</head>
+<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+        body {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            flex-direction: column;
+            background-color: rgb(147, 165, 115);
+            overflow: hidden;
+        }
+
+        header {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 1px 1px 1px black;
+            background-color: rgb(81, 126, 81);
+            text-transform: uppercase;
+            font-family: 'Lobster', cursive;
+        }
+
+        header > img {
+            display: flex;
+            height: 5rem;
+        }
+
+        main {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        section {
+            display: flex;
+        }
+
+        #user {
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #user > div {
+            display: flex;
+            height: fit-content;
+            width: 240px;
+            flex-direction: column;
+        }
+
+        #user > div > * {
+            display: flex;
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        #messages {
+            height: 100%;
+            width: 100%;
+            background-color: rgb(203, 212, 186);
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        #messages-list {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            list-style: none;
+            margin: 0;
+            padding: 0 20px;
+        }
+
+        #messages-list > li {
+            display: flex;
+            height: fit-content;
+        }
+
+        #messages-list > li > p {
+            display: flex;
+            height: fit-content;
+            background-color: aliceblue;
+            padding: 5px 10px;
+        }
+
+        #messager {
+            flex-grow: 1;
+            padding: 5px 10px;
+            align-items: center;
+        }
+
+        #messager > textarea {
+            display: flex;
+            flex-grow: 1;
+            height: 100px;
+            padding: 10px;
+            resize: none;
+        }
+
+        #messager > button {
+            display: flex;
+            height: 70px;
+            width: 70px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 100%;
+            margin-left: 10px;
+            background-color: hsl(120, 100%, 25%);
+        }
+
+        #messager > button:hover {
+            background-color: greenyellow;
+        }
+
+        .message-send {
+            justify-content: end;
+        }
+
+        .message-received {
+            justify-content: start;
+        }
+
+        .message-system {
+            justify-content: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <header>
+        <img src="logo.png"/>
+        <h1>Chatão do Alpha</h1>
+    </header>
+    <main>
+        <section id="user">
+            <div>
+                <input type="text" id="user-input">
+                <button id="user-submit">Entrar</button>
+            </div>
+        </section>
+        <section id="messages" class="hidden">
+            <ul id="messages-list"></ul>
+        </section>
+        <section id="messager" class="hidden">
+            <textarea id="messager-text" tabindex="2"></textarea>
+            <button id="messager-submit">Enviar</button>
+        </section>
+    </main>
+    <script>
+        const userSetting = document.getElementById("user");
+        const userInput = document.getElementById("user-input");
+        const userSubmit = document.getElementById("user-submit");
+
+        const messages = document.getElementById("messages");
+        const messagesList = document.getElementById("messages-list");
+
+        const messager = document.getElementById("messager");
+        const messagerText = document.getElementById("messager-text");
+        const messagerSubmit = document.getElementById("messager-submit");
+        let clientID;
+        
+        const usersColors = new Map();
+        usersColors.set('system', `unset`); //hsla(360, 0%, 50%, .25)
+        let chatSocket;
+
+        function startChat ()
+        {
+            chatSocket = new WebSocket("wss://localhost:8000", "https");
+            const username = userInput.value;
+            chatSocket.onopen = function (event) 
+            {
+                console.log("abriu servidor");
+                userSetting.classList.add("hidden");
+                messages.classList.remove("hidden");
+                messager.classList.remove("hidden");
+                messagerSubmit.addEventListener("click", sendMessage);
+                userSubmit.removeEventListener('click', startChat);
+                chatSocket.onmessage = receiveMessages;
+
+                const msgUser = {
+                    type: "setuser",
+                    text: username,
+                    id:   clientID,
+                    date: Date.now()
+                };
+                chatSocket.send(JSON.stringify(msgUser));
+            }
+
+            chatSocket.onclose = function (event) 
+            {
+                console.log("fechou servidor");
+                userSetting.classList.remove("hidden");
+                messages.classList.add("hidden");
+                messager.classList.add("hidden");
+                messagerSubmit.removeEventListener("click", sendMessage);
+                userSubmit.addEventListener('click', startChat);
+                chatSocket.onmessage = undefined;
+            }
+        }
+        userSubmit.addEventListener('click', startChat);
+
+        function renderMessages(msgs)
+        {
+            messagesList.innerHTML = '';
+            msgs.forEach(msg => 
+            {
+                if(!usersColors.has(msg.id))
+                {
+                    usersColors.set(msg.id, randomColor());
+                }
+
+                const li = document.createElement("li");
+                if(msg.id === "system") li.classList.add("message-system");
+                else if(msg.id === clientID) li.classList.add("message-send");
+                else li.classList.add("message-received");
+                const p = document.createElement("p");
+                p.style = `background-color:${usersColors.get(msg.id)}`;
+                p.innerText = msg.text;
+                li.appendChild(p);
+                messagesList.appendChild(li);
+            });
+
+            messages.scrollTo(0, messages.scrollHeight);
+        }
+
+        function randomColor ()
+        {
+            const hue = Math.random()*360;
+            return `hsla(${hue}, 100%, 75%, .5)`;
+        }
+
+        function receiveMessages(response)
+        {
+            const responseData = JSON.parse(response.data);
+            if (responseData.type == "setup")
+            {
+                clientID = responseData.data;
+                usersColors.set(clientID, `hsla(360, 100%, 100%, .5)`);
+            }
+            else 
+            {
+                console.log(responseData.data);
+                renderMessages(responseData.data);
+            }
+        }
+
+        function sendMessage(e)
+        {
+            const text = messagerText.value;
+            messagerText.value = '';
+            if(!text) {
+                console.log("Nenhuma mensagem para enviar");
+                return;
+            }
+            console.log("Enviando mensagem");
+            const msg = {
+                type: "message",
+                text: text,
+                id:   clientID,
+                date: Date.now()
+            };
+            chatSocket.send(JSON.stringify(msg));
+        }
+    </script>
+</body>
+</html>
