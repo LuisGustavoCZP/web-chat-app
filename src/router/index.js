@@ -17,7 +17,7 @@ router.use('/favicon.png', (req, res) => {
 router.use('/', (req, res) => 
 {
     //const page = fs.readFileSync('./public/index.html');
-    res.write(style);
+    res.write(`<style>${style}</style>`);
     res.write(page);
     res.end();
 });
