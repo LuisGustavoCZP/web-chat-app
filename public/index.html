@@ -7,143 +7,6 @@
     <title>Chatão do Alpha</title>
 </head>
 <body>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
-
-        body {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            margin: 0;
-            flex-direction: column;
-            background-color: rgb(147, 165, 115);
-            overflow: hidden;
-        }
-
-        header {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-            box-shadow: 1px 1px 1px black;
-            background-color: rgb(81, 126, 81);
-            text-transform: uppercase;
-            font-family: 'Lobster', cursive;
-        }
-
-        header > img {
-            display: flex;
-            height: 5rem;
-        }
-
-        main {
-            display: flex;
-            height: 100%;
-            width: 100%;
-            flex-direction: column;
-            overflow: hidden;
-            font-family: 'IBM Plex Sans', sans-serif;
-        }
-
-        section {
-            display: flex;
-        }
-
-        #user {
-            height: 100%;
-            width: 100%;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #user > div {
-            display: flex;
-            height: fit-content;
-            width: 240px;
-            flex-direction: column;
-        }
-
-        #user > div > * {
-            display: flex;
-            flex-grow: 1;
-            padding: 10px;
-        }
-
-        #messages {
-            height: 100%;
-            width: 100%;
-            background-color: rgb(203, 212, 186);
-            overflow-x: hidden;
-            overflow-y: scroll;
-        }
-
-        #messages-list {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            list-style: none;
-            margin: 0;
-            padding: 0 20px;
-        }
-
-        #messages-list > li {
-            display: flex;
-            height: fit-content;
-        }
-
-        #messages-list > li > p {
-            display: flex;
-            height: fit-content;
-            background-color: aliceblue;
-            padding: 5px 10px;
-        }
-
-        #messager {
-            flex-grow: 1;
-            padding: 5px 10px;
-            align-items: center;
-        }
-
-        #messager > textarea {
-            display: flex;
-            flex-grow: 1;
-            height: 100px;
-            padding: 10px;
-            resize: none;
-        }
-
-        #messager > button {
-            display: flex;
-            height: 70px;
-            width: 70px;
-            align-items: center;
-            justify-content: center;
-            border-radius: 100%;
-            margin-left: 10px;
-            background-color: hsl(120, 100%, 25%);
-        }
-
-        #messager > button:hover {
-            background-color: greenyellow;
-        }
-
-        .message-send {
-            justify-content: end;
-        }
-
-        .message-received {
-            justify-content: start;
-        }
-
-        .message-system {
-            justify-content: center;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
     <header>
         <img src="logo.png"/>
         <h1>Chatão do Alpha</h1>
@@ -182,7 +45,15 @@
 
         function startChat ()
         {
-            chatSocket = new WebSocket("wss://localhost:8000", "https");
+            try 
+            {
+                chatSocket = new WebSocket("wss://localhost:8000", "https", "http");
+            } 
+            catch (error) 
+            {
+                //chatSocket = new WebSocket("ws://localhost:8000", "http");
+            }
+
             const username = userInput.value;
             chatSocket.onopen = function (event) 
             {

@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 
+const style = fs.readFileSync('./public/style.css');
 const page = fs.readFileSync('./public/index.html');
 const logo = fs.readFileSync('./public/logo.png');
 const router = express.Router();
@@ -16,6 +17,7 @@ router.use('/favicon.png', (req, res) => {
 router.use('/', (req, res) => 
 {
     //const page = fs.readFileSync('./public/index.html');
+    res.write(style);
     res.write(page);
     res.end();
 });
