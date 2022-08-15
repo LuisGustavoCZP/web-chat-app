@@ -1,0 +1,19 @@
+ports:
+  - port: 8000
+    visibility: public
+    onOpen: open-browser
+
+tasks:
+  - name: Start Server Stack
+    init: | 
+     npm i
+    command: npm start
+    openMode: tab-after
+    env:
+      PORT: 8000
+
+github: 
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
