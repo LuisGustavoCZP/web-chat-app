@@ -16,7 +16,7 @@ function broadcastMsgs ()
 {
     const msgsString = JSON.stringify(msgs);
     const userslist = Object.values(users);
-    console.log(userslist.length);
+    //console.log(userslist.length);
     userslist.forEach(user => 
     {
         user.socket.send(msgsString);
@@ -44,7 +44,7 @@ function socket (server)
     
         function receiveUsername (resp)
         {
-            console.log(resp);
+            //console.log(resp);
             const initialSetup = {
                 type: "setup",
                 data: userid
@@ -64,6 +64,7 @@ function socket (server)
 
         function receiveMessage (data)
         {
+            data.username = users[data.id].username;
             addMsg(data);
             broadcastMsgs();
         };
@@ -80,7 +81,16 @@ function socket (server)
         });
 
         ws.on('close', () => {
+            const msg = {
+                type: "message",
+                text: `${users[userid].username} saiu`,
+                id:   "system",
+                date: Date.now()
+            };
+            addMsg(msg);
+            broadcastMsgs();
             removeUser(userid);
+            console.log(`Client disconnected with id:${userid}.`);
         });
     });
 }

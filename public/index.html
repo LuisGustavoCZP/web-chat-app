@@ -15,133 +15,23 @@
         <section id="user">
             <div>
                 <input type="text" id="user-input">
-                <button id="user-submit">Entrar</button>
+                <button id="user-submit" class="disabled">Entrar</button>
             </div>
         </section>
         <section id="messages" class="hidden">
             <ul id="messages-list"></ul>
         </section>
         <section id="messager" class="hidden">
-            <textarea id="messager-text" tabindex="2"></textarea>
-            <button id="messager-submit">Enviar</button>
+            <div>
+                <button id="messager-emoji">E</button>
+                <button id="messager-file">F</button>
+                <button id="messager-audio">A</button>
+            </div>
+            <span>
+                <textarea id="messager-text" tabindex="2"></textarea>
+                <button id="messager-submit" class="disabled">Enviar</button>
+            </span>
         </section>
     </main>
-    <script>
-        const userSetting = document.getElementById("user");
-        const userInput = document.getElementById("user-input");
-        const userSubmit = document.getElementById("user-submit");
-
-        const messages = document.getElementById("messages");
-        const messagesList = document.getElementById("messages-list");
-
-        const messager = document.getElementById("messager");
-        const messagerText = document.getElementById("messager-text");
-        const messagerSubmit = document.getElementById("messager-submit");
-        let clientID;
-        
-        const usersColors = new Map();
-        usersColors.set('system', `unset`); //hsla(360, 0%, 50%, .25)
-        let chatSocket;
-
-        function startChat ()
-        {
-            chatSocket = new WebSocket(`wss://${window.location.host}`, "https", "http");
-
-            const username = userInput.value;
-            chatSocket.onopen = function (event) 
-            {
-                console.log("abriu servidor");
-                userSetting.classList.add("hidden");
-                messages.classList.remove("hidden");
-                messager.classList.remove("hidden");
-                messagerSubmit.addEventListener("click", sendMessage);
-                userSubmit.removeEventListener('click', startChat);
-                chatSocket.onmessage = receiveMessages;
-
-                const msgUser = {
-                    type: "setuser",
-                    text: username,
-                    id:   clientID,
-                    date: Date.now()
-                };
-                chatSocket.send(JSON.stringify(msgUser));
-            }
-
-            chatSocket.onclose = function (event) 
-            {
-                console.log("fechou servidor");
-                userSetting.classList.remove("hidden");
-                messages.classList.add("hidden");
-                messager.classList.add("hidden");
-                messagerSubmit.removeEventListener("click", sendMessage);
-                userSubmit.addEventListener('click', startChat);
-                chatSocket.onmessage = undefined;
-            }
-        }
-        userSubmit.addEventListener('click', startChat);
-
-        function renderMessages(msgs)
-        {
-            messagesList.innerHTML = '';
-            msgs.forEach(msg => 
-            {
-                if(!usersColors.has(msg.id))
-                {
-                    usersColors.set(msg.id, randomColor());
-                }
-
-                const li = document.createElement("li");
-                if(msg.id === "system") li.classList.add("message-system");
-                else if(msg.id === clientID) li.classList.add("message-send");
-                else li.classList.add("message-received");
-                const p = document.createElement("p");
-                p.style = `background-color:${usersColors.get(msg.id)}`;
-                p.innerText = msg.text;
-                li.appendChild(p);
-                messagesList.appendChild(li);
-            });
-
-            messages.scrollTo(0, messages.scrollHeight);
-        }
-
-        function randomColor ()
-        {
-            const hue = Math.random()*360;
-            return `hsla(${hue}, 100%, 75%, .5)`;
-        }
-
-        function receiveMessages(response)
-        {
-            const responseData = JSON.parse(response.data);
-            if (responseData.type == "setup")
-            {
-                clientID = responseData.data;
-                usersColors.set(clientID, `hsla(360, 100%, 100%, .5)`);
-            }
-            else 
-            {
-                console.log(responseData.data);
-                renderMessages(responseData.data);
-            }
-        }
-
-        function sendMessage(e)
-        {
-            const text = messagerText.value;
-            messagerText.value = '';
-            if(!text) {
-                console.log("Nenhuma mensagem para enviar");
-                return;
-            }
-            console.log("Enviando mensagem");
-            const msg = {
-                type: "message",
-                text: text,
-                id:   clientID,
-                date: Date.now()
-            };
-            chatSocket.send(JSON.stringify(msg));
-        }
-    </script>
 </body>
 </html>

@@ -1,8 +1,12 @@
 const express = require('express');
 const fs = require('fs');
 
+/* 
 const style = fs.readFileSync('./public/style.css');
 const page = fs.readFileSync('./public/index.html');
+const script = fs.readFileSync('./public/index.js'); 
+ */
+
 const logo = fs.readFileSync('./public/logo.png');
 const router = express.Router();
 
@@ -16,10 +20,15 @@ router.use('/favicon.png', (req, res) => {
 
 router.use('/', (req, res) => 
 {
-    //const page = fs.readFileSync('./public/index.html');
+
+    const style = fs.readFileSync('./public/style.css');
+    const page = fs.readFileSync('./public/index.html');
+    const script = fs.readFileSync('./public/index.js');
+
     res.writeHead(200);
     res.write(`<style>${style}</style>`);
     res.write(page);
+    res.write(`<script>${script}</script>`);
     res.end();
 });
 

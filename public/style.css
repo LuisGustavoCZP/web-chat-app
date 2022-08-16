@@ -19,11 +19,13 @@ header {
     background-color: rgb(81, 126, 81);
     text-transform: uppercase;
     font-family: 'Lobster', cursive;
+    user-select: none;
 }
 
 header > img {
     display: flex;
     height: 5rem;
+    -webkit-user-drag: none;
 }
 
 main {
@@ -37,6 +39,24 @@ main {
 
 section {
     display: flex;
+}
+
+button {
+    cursor: pointer;
+    background-color: hsl(120, 100%, 25%);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+button:hover {
+    background-color: greenyellow;
+}
+
+button.disabled {
+    pointer-events: none;
+    cursor: none;
+    background-color: hsl(120, 10%, 42%);
 }
 
 #user {
@@ -60,6 +80,10 @@ section {
     padding: 10px;
 }
 
+#user > div > input {
+    background-color: hsl(120, 28%, 81%);
+}
+
 #messages {
     height: 100%;
     width: 100%;
@@ -80,12 +104,40 @@ section {
 #messages-list > li {
     display: flex;
     height: fit-content;
+    margin-bottom: 25px;
 }
 
-#messages-list > li > p {
+#messages-list > li > div {
     display: flex;
     height: fit-content;
     background-color: aliceblue;
+    flex-direction: column;
+    min-width: 150px;
+}
+
+#messages-list > li > div > h4 {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+}
+
+#messages-list > li > div > h6 {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    justify-content: flex-end;
+    margin-top: 5px;
+    padding: 2px 4px;
+}
+
+#messages-list > li > div > p {
+    padding: 0;
+    margin: 0;
+    margin-left: 5px;
     padding: 5px 10px;
 }
 
@@ -95,15 +147,33 @@ section {
     align-items: center;
 }
 
-#messager > textarea {
+#messager > div {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+}
+
+#messager > div > button {
+    margin: 5px;
+}
+
+#messager > span {
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+#messager > span > textarea {
     display: flex;
     flex-grow: 1;
     height: 100px;
     padding: 10px;
     resize: none;
+    background-color: hsl(120, 28%, 81%);
 }
 
-#messager > button {
+#messager > span > button {
     display: flex;
     height: 70px;
     width: 70px;
@@ -111,11 +181,6 @@ section {
     justify-content: center;
     border-radius: 100%;
     margin-left: 10px;
-    background-color: hsl(120, 100%, 25%);
-}
-
-#messager > button:hover {
-    background-color: greenyellow;
 }
 
 .message-send {
