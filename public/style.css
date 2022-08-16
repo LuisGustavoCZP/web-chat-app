@@ -47,6 +47,9 @@ button {
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:hover {
@@ -57,6 +60,10 @@ button.disabled {
     pointer-events: none;
     cursor: none;
     background-color: hsl(120, 10%, 42%);
+}
+
+button > i {
+    margin-top: 2px;
 }
 
 #user {
@@ -174,13 +181,18 @@ button.disabled {
 }
 
 #messager > span > button {
-    display: flex;
     height: 70px;
     width: 70px;
-    align-items: center;
-    justify-content: center;
     border-radius: 100%;
     margin-left: 10px;
+}
+
+#messager > span > button > span {
+    font-size:48px;
+}
+
+#messager > span > button:hover > span {
+    color:rgb(0, 255, 34);
 }
 
 .message-send {

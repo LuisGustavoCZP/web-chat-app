@@ -66,7 +66,7 @@ function socketClosed (event)
 
     userInput.addEventListener('keydown', inputUser);
     userSubmit.addEventListener('click', startChat);
-    
+
     userInput.focus();
     chatSocket.onmessage = undefined;
 }
@@ -176,13 +176,22 @@ function sendMessage()
 function inputManager (e, inputer, submiter, enableCallback, disableCallback)
 {
     var key = e.which || e.keyCode;
-    const text = inputer.value.trim();
-    if(key == 8 && text.length == 1)
+    const text = inputer.value;
+    if(key == 8)
     {
-        submiter.classList.add("disabled");
-        if(disableCallback) disableCallback();
+        if(text.length == 1)
+        {
+            submiter.classList.add("disabled");
+            if(disableCallback) disableCallback();
+        }
+        return;
     }
-    else if(text.length >= 0)
+
+    if(key < 48 || key > 90) return;
+
+    //const matchs = text.match(/\w*/gi);
+    //console.log(matchs);
+    if(text.trim().length >= 0)
     {
         submiter.classList.remove("disabled");
         if (key == 13 && !e.shiftKey)
