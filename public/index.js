@@ -17,6 +17,7 @@ let chatSocket;
 function startChat ()
 {
     chatSocket = new WebSocket(`wss://${window.location.host}`, "https", "http");
+
     chatSocket.onopen = socketOpened;
     chatSocket.onclose = socketClosed;
 }
@@ -31,12 +32,10 @@ function socketOpened (event)
     messagerSubmit.addEventListener("click", sendMessage);
 
     chatSocket.onmessage = receiveMessages;
-    const username = userInput.value;
-    console.log(username);
+
     const msgUser = {
-        type: "setuser",
-        text: username,
-        id:   clientID,
+        type: "session",
+        id: sessionid,
         date: Date.now()
     };
     chatSocket.send(JSON.stringify(msgUser));
@@ -46,7 +45,11 @@ function socketOpened (event)
 
 function socketClosed (event)
 {
-    console.log("fechou servidor");
+    console.log("fechou servidor", event);
+    if(event.code === 1002 && event.reason === "A sessão não é mais válida")
+    {
+        location.assign('/');
+    }
 
     messages.classList.add("hidden");
     messager.classList.add("hidden");
@@ -54,7 +57,6 @@ function socketClosed (event)
     messagerInput.removeEventListener('keydown', inputMessage);
     messagerSubmit.removeEventListener("click", sendMessage);
 
-    userInput.focus();
     chatSocket.onmessage = undefined;
 }
 
@@ -179,3 +181,4 @@ async function getEmojis (group)
 }
 
 getEmojis();
+startChat();

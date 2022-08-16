@@ -3,7 +3,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
-const { port, isSsl } = require('./config');
+const { port, isSsl } = require('./configs');
 const router = require('./router');
 const socket = require('./socket');
 

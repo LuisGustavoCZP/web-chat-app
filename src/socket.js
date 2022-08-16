@@ -7,62 +7,56 @@ function socket (server)
     
     wss.on('connection', ws => 
     {
-        
-
-        console.log(`Client connected with id:${userid}.`);
-    
-        function receiveUsername (resp)
-        {
-            //console.log(resp);
-            const initialSetup = {
-                type: "setup",
-                data: userid
-            };
-            ws.send(JSON.stringify(initialSetup));
-
-            addUser(userid, {socket:ws, username:resp.text});
-            const msg = {
-                type: "message",
-                text: `${resp.text} entrou`,
-                id:   "system",
-                date: Date.now()
-            };
-            addMsg(msg);
-            broadcastMsgs();
-        };
+        let userid = undefined;
 
         function receiveSession (resp)
         {
+            console.log(resp);
+            const session = data.sessions[resp.id];
+            if(!session) 
+            {
+                ws.close(1002, "A sessão não é mais válida");//
+                return;
+            }
+
+            userid = session.userid;
+            console.log(`Client connected with id:${userid}.`);
+
             const initialSetup = {
                 type: "setup",
                 data: userid
             };
             ws.send(JSON.stringify(initialSetup));
 
-            addUser(userid, {socket:ws, username:resp.text});
+            const user = data.users[userid];
+            if(!user) return;
+
+            user.socket = ws;
+            
             const msg = {
                 type: "message",
-                text: `${resp.text} entrou`,
+                text: `${user.username} entrou`,
                 id:   "system",
                 date: Date.now()
             };
-            addMsg(msg);
-            broadcastMsgs();
+            data.addMsg(msg);
+            data.broadcastMsgs();
         };
 
-        function receiveMessage (data)
+        function receiveMessage (msg)
         {
-            if(data["id"]) delete data["id"];
-            data.id = userid;
-            data.username = users[data.id].username;
-            addMsg(data);
-            broadcastMsgs();
+            const user = data.users[userid];
+            if(!user) return;
+            if(msg["id"]) delete msg["id"];
+            msg.id = userid;
+            msg.username = user.username;
+            data.addMsg(msg);
+            data.broadcastMsgs();
         };
 
         const events = {
             "message": receiveMessage,
-            "session": receiveSession,
-            "username": receiveUsername
+            "session": receiveSession
         }
 
         ws.on('message', resp => 
@@ -72,7 +66,7 @@ function socket (server)
         });
 
         ws.on('close', () => {
-            const user = users[userid];
+            const user = data.users[userid];
             if(user) {
                 const msg = {
                     type: "message",
@@ -80,9 +74,8 @@ function socket (server)
                     id:   "system",
                     date: Date.now()
                 };
-                addMsg(msg);
-                broadcastMsgs();
-                removeUser(user);
+                data.addMsg(msg);
+                data.broadcastMsgs();
             }
             console.log(`Client disconnected with id:${userid}.`);
         });

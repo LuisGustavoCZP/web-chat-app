@@ -11,7 +11,7 @@ function inputUser(e)
 
 function login ()
 {
-    const match = userInput.value.match(/(\w{1,}[ ])*\w{0,}/gi);
+    const match = userInput.value.match(/(\w{1,}[ ])*\w{1,}/gi);
     if(!match || match.length == 0) return;
     const username = match[0].trim();
     console.log(username);

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { sessionidValidator } = require("../validators");
 //const homePage = fs.readFileSync('./public/index.html');
 //const loginPage = fs.readFileSync('./public/login.html');
 
@@ -13,6 +14,15 @@ function sendLoginPage (req, res)
 
 function sendHomePage (req, res) 
 {
+    const { sessionid } = req.params;
+
+    const validSession = sessionidValidator(sessionid);
+    if(!validSession)
+    {   
+        res.redirect(`/`);
+        return;
+    }
+
     const homePage = fs.readFileSync('./public/index.html');
 
     res.writeHead(200);
