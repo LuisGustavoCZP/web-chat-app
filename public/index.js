@@ -187,14 +187,15 @@ function inputManager (e, inputer, submiter, enableCallback, disableCallback)
         return;
     }
 
-    if(key < 48 || key > 90) return;
+    const isSend = key == 13 && !e.shiftKey;
+    if(!isSend && (key < 48 || key > 90)) return;
 
     //const matchs = text.match(/\w*/gi);
     //console.log(matchs);
     if(text.trim().length >= 0)
     {
         submiter.classList.remove("disabled");
-        if (key == 13 && !e.shiftKey)
+        if (isSend)
         {
             e.preventDefault();
             if(enableCallback) enableCallback();
