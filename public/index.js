@@ -1,6 +1,6 @@
-const userSetting = document.getElementById("user");
-const userInput = document.getElementById("user-input");
-const userSubmit = document.getElementById("user-submit");
+import {inputManager} from './input.js';
+const sessionid = location.pathname.replace(/\/\w*\//gi, '');
+console.log(sessionid);
 
 const messages = document.getElementById("messages");
 const messagesList = document.getElementById("messages-list");
@@ -14,13 +14,8 @@ const usersColors = new Map();
 usersColors.set('system', `unset`); //hsla(360, 0%, 50%, .25)
 let chatSocket;
 
-userInput.addEventListener('keydown', inputUser);
-userSubmit.addEventListener('click', startChat);
-userInput.focus();
-
 function startChat ()
 {
-    userSubmit.classList.add("disabled");
     chatSocket = new WebSocket(`wss://${window.location.host}`, "https", "http");
     chatSocket.onopen = socketOpened;
     chatSocket.onclose = socketClosed;
@@ -29,15 +24,11 @@ function startChat ()
 function socketOpened (event)
 {
     console.log("abriu servidor");
-    userSetting.classList.add("hidden");
     messages.classList.remove("hidden");
     messager.classList.remove("hidden");
 
     messagerInput.addEventListener('keydown', inputMessage);
     messagerSubmit.addEventListener("click", sendMessage);
-
-    userInput.removeEventListener('keydown', inputUser);
-    userSubmit.removeEventListener('click', startChat);
 
     chatSocket.onmessage = receiveMessages;
     const username = userInput.value;
@@ -57,15 +48,11 @@ function socketClosed (event)
 {
     console.log("fechou servidor");
 
-    userSetting.classList.remove("hidden");
     messages.classList.add("hidden");
     messager.classList.add("hidden");
 
     messagerInput.removeEventListener('keydown', inputMessage);
     messagerSubmit.removeEventListener("click", sendMessage);
-
-    userInput.addEventListener('keydown', inputUser);
-    userSubmit.addEventListener('click', startChat);
 
     userInput.focus();
     chatSocket.onmessage = undefined;
@@ -167,40 +154,9 @@ function sendMessage()
     const msg = {
         type: "message",
         text: text,
-        id:   clientID,
         date: Date.now()
     };
     chatSocket.send(JSON.stringify(msg));
-}
-
-function inputManager (e, inputer, submiter, enableCallback, disableCallback)
-{
-    var key = e.which || e.keyCode;
-    const text = inputer.value;
-    if(key == 8)
-    {
-        if(text.length == 1)
-        {
-            submiter.classList.add("disabled");
-            if(disableCallback) disableCallback();
-        }
-        return;
-    }
-
-    const isSend = key == 13 && !e.shiftKey;
-    if(!isSend && (key < 48 || key > 90)) return;
-
-    //const matchs = text.match(/\w*/gi);
-    //console.log(matchs);
-    if(text.trim().length >= 0)
-    {
-        submiter.classList.remove("disabled");
-        if (isSend)
-        {
-            e.preventDefault();
-            if(enableCallback) enableCallback();
-        }
-    }
 }
 
 function inputMessage(e)
@@ -208,7 +164,18 @@ function inputMessage(e)
     inputManager(e, messagerInput, messagerSubmit, sendMessage);
 }
 
-function inputUser(e)
+const emojis = {};
+async function getEmojis (group)
 {
-    inputManager(e, userInput, userSubmit, startChat);
+    const emojisResp = await fetch(`/emojis/${group?group:''}`).then(resp => resp.json());
+    /* emojisResp.forEach(element => 
+    {
+        if(element.version >= "13") return;
+        if(!emojis[element.category]) emojis[element.category] = [];
+        emojis[element.category].push(element);
+    }); */
+    
+    console.log(emojisResp);
 }
+
+getEmojis();

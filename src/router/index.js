@@ -1,37 +1,28 @@
 const express = require('express');
-const fs = require('fs');
 
-/* 
-const style = fs.readFileSync('./public/style.css');
-const page = fs.readFileSync('./public/index.html');
-const script = fs.readFileSync('./public/index.js'); 
- */
+const controllers = require('../controllers');
+const views = require('../views');
 
-const logo = fs.readFileSync('./public/logo.png');
 const router = express.Router();
 
-router.use('/logo.png', (req, res) => {
-    res.send(logo);
-});
+router.use('/styles/style.css', views.sendGlobalStyle);
 
-router.use('/favicon.png', (req, res) => {
-    res.send(logo);
-});
+router.use('/scripts/input.js', views.sendInputScript);
 
-router.use('/', (req, res) => 
-{
+router.use('/scripts/index.js', views.sendIndexScript);
 
-    const style = fs.readFileSync('./public/style.css');
-    const page = fs.readFileSync('./public/index.html');
-    const script = fs.readFileSync('./public/index.js');
+router.use('/scripts/login.js', views.sendLoginScript);
 
-    res.writeHead(200);
-    res.write(`<style>${style}</style>`);
-    res.write(page);
-    res.write(`<script>${script}</script>`);
-    res.end();
-});
+router.use('/images/logo.png', views.sendLogoIcon);
+router.use('/favicon.png', views.sendLogoIcon);
 
+router.get('/emojis/', views.emojis);
+
+router.get('/login', controllers.loginRoute);
+
+router.use('/home/:sessionid', views.sendHomePage);
+
+router.use('/', views.sendLoginPage);
 //router.all('/', (req, res) => res.send('Hi there!'));
 
 
