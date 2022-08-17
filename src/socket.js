@@ -31,16 +31,12 @@ function socket (server)
             const user = data.users[userid];
             if(!user) return;
 
-            user.socket = ws;
+            data.addConnection(userid, ws);
             
-            const msg = {
-                type: "message",
-                text: `${user.username} entrou`,
-                id:   "system",
-                date: Date.now()
-            };
-            data.addMsg(msg);
-            data.broadcastMsgs();
+            data.broadcastLog(`${user} entrou`);
+            data.broadcastUsers();
+            data.msgsTo(userid);
+            
         };
 
         function receiveMessage (msg)
@@ -49,7 +45,7 @@ function socket (server)
             if(!user) return;
             if(msg["id"]) delete msg["id"];
             msg.id = userid;
-            msg.username = user.username;
+            msg.username = user;
             data.addMsg(msg);
             data.broadcastMsgs();
         };
@@ -62,20 +58,17 @@ function socket (server)
         ws.on('message', resp => 
         {
             const msg = JSON.parse(resp.toString());
-            events[msg.type] (msg);
+            const event = events[msg.type];
+            if(event) event(msg);
         });
 
         ws.on('close', () => {
             const user = data.users[userid];
-            if(user) {
-                const msg = {
-                    type: "message",
-                    text: `${user.username} saiu`,
-                    id:   "system",
-                    date: Date.now()
-                };
-                data.addMsg(msg);
-                data.broadcastMsgs();
+            if(user) 
+            {
+                data.removeConnection(userid);
+                data.broadcastLog(`${user} saiu`);
+                data.broadcastUsers();
             }
             console.log(`Client disconnected with id:${userid}.`);
         });

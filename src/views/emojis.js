@@ -25,17 +25,19 @@ const emojiMap = {
 async function loadEmojis ()
 {
     const unicodeEmoji = await import('unicode-emoji');
-    const allEmojis = unicodeEmoji.getEmojis();
+    const omitWhere = { versionAbove: '12.0' };
+    const allEmojis = unicodeEmoji.getEmojis(omitWhere);
     
     allEmojis.forEach(emoji =>
     {
-        if(emoji.version < "13")
+        if(emoji.version < "13" && !emoji.keywords.some((e) => e === "outlined"))
         {
             const i = emojiMap[emoji.category];
             emojis[i][1].push(emoji);
         }
     });
 }
+
 loadEmojis ();
 
 async function getEmojis (req, res)

@@ -1,5 +1,12 @@
 import {inputManager} from './input.js';
 import createSocket from "./socket.js";
+import usersWindow from "./users.js";
+import logs from "./logs.js";
+
+function ortoDigits (num)
+{
+    return (num).toLocaleString('pt-BR', {minimumIntegerDigits: 2, useGrouping:false});
+}
 
 function createMessager ()
 {
@@ -68,7 +75,7 @@ function createMessager ()
             const time = document.createElement("h6");
             const msgDate = new Date(msg.date);
             console.log(msgDate);
-            time.innerText = `${msgDate.getHours()}:${msgDate.getMinutes()}`;
+            time.innerText = `${ortoDigits(msgDate.getHours())}:${ortoDigits(msgDate.getMinutes())}`;
             div.appendChild(time);
         }
 
@@ -114,18 +121,45 @@ function createMessager ()
         return `hsla(${hue}, 100%, 75%, .5)`;
     }
 
+    function receiveSetup (data)
+    {
+        clientID = data;
+        usersColors.set(clientID, `hsla(360, 100%, 100%, .5)`);
+    }
+
+    function receiveChat (data)
+    {
+        //console.log(data);
+        renderMessages(data);
+    }
+
+    function receiveLog (data)
+    {
+        console.log(data);
+        logs.update(data);
+    }
+
+    function receiveUserlist (data)
+    {
+        console.log(data);
+        usersWindow.update(data);
+    }
+
+    const events = {
+        "setup": receiveSetup,
+        "chat": receiveChat,
+        "log": receiveLog,
+        "userlist": receiveUserlist,
+    };
+
     function receiveMessages(response)
     {
         const responseData = JSON.parse(response.data);
-        if (responseData.type == "setup")
+        const event = events[responseData.type];
+
+        if(event) 
         {
-            clientID = responseData.data;
-            usersColors.set(clientID, `hsla(360, 100%, 100%, .5)`);
-        }
-        else 
-        {
-            console.log(responseData.data);
-            renderMessages(responseData.data);
+            event(responseData.data);
         }
     }
 
@@ -159,10 +193,18 @@ function createMessager ()
         messagerInput.focus();
     }
 
+    function write (text)
+    {
+        //console.log("escrevendo: ", text);
+        messagerInput.value += text;
+        messagerSubmit.classList.remove("disabled");
+    }
+
     return {
         start,
         enable,
-        disable
+        disable,
+        write
     }
 }
 

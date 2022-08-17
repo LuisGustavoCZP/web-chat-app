@@ -12,7 +12,7 @@ function loginRoute (req, res)
         return;
     }
     console.log(validUsername);
-    const userid = data.addUser({username:validUsername});
+    const userid = data.addUser(validUsername);
     const sessionid = data.addSession(userid);
     res.redirect(`/home/${sessionid}`);
 }

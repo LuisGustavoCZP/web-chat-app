@@ -4,7 +4,9 @@ const msgs = {
     type: "chat",
     data: [],
 };
+
 const users = {};
+const usersConnection = {};
 const sessions = {};
 
 function addMsg (msg)
@@ -12,27 +14,78 @@ function addMsg (msg)
     msgs.data.push(msg);
 }
 
-function broadcastMsgs ()
+function sendTo (userid, info)
 {
-    const msgsString = JSON.stringify(msgs);
-    const userslist = Object.values(users);
-    //console.log(userslist.length);
-    userslist.forEach(user => 
+    const connection = usersConnection[userid];
+    const infoString = JSON.stringify(info);
+    if(connection)
     {
-        user.socket.send(msgsString);
+        connection.send(infoString);
+    }
+}
+
+function msgsTo (userid)
+{
+    sendTo(userid, msgs);
+}
+
+function broadcast (info)
+{
+    const connectionlist = Object.values(usersConnection);
+    const infoString = JSON.stringify(info);
+    connectionlist.forEach(connection => 
+    {
+        connection.send(infoString);
     });
 }
 
-function addUser (data)
+function broadcastMsgs ()
+{
+    broadcast(msgs);
+}
+
+function broadcastLog (log)
+{
+    const logmsg = {
+        type: "log",
+        data: log,
+        id:   "system",
+        date: Date.now()
+    };
+    broadcast(logmsg);
+}
+
+function broadcastUsers ()
+{
+    const usermsg = {
+        type: "userlist",
+        data: Object.values(users),
+    };
+    broadcast(usermsg);
+}
+
+function addUser (username)
 {
     const userid = uuid();
-    users[userid] = data;
+    users[userid] = username;
     return userid;
+}
+
+function addConnection (userid, connection)
+{
+    usersConnection[userid] = connection;
+    return userid;
+}
+
+function removeConnection (userid)
+{
+    delete usersConnection[userid];
 }
 
 function removeUser (user)
 {
     delete users[user.id];
+    delete usersConnection[user.id];
 }
 
 function addSession (userid)
@@ -56,5 +109,10 @@ module.exports = {
     addUser,
     removeUser,
     addSession,
-    removeSession
+    removeSession,
+    addConnection,
+    removeConnection,
+    broadcastUsers,
+    broadcastLog,
+    msgsTo
 }

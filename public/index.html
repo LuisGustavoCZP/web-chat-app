@@ -14,9 +14,9 @@
             <img src="/images/logo.png"/>
             <h1>Chatão do Alpha</h1>
         </div>
-        <div class="options">
-            <button><span class="material-symbols-rounded" width="40px">groups</span></button>
-            <button><span class="material-symbols-rounded" width="40px">manage_accounts</span></button>
+        <div class="user">
+            <button id="user-list"><span class="material-symbols-rounded" width="40px">groups</span></button>
+            <button id="user-profile" class="hidden"><span class="material-symbols-rounded" width="40px">manage_accounts</span></button>
         </div>
     </header>
     <main>
@@ -26,13 +26,16 @@
         <section id="messager" class="hidden">
             <div>
                 <button id="messager-emoji"><span class="material-symbols-rounded">add_reaction</span></button>
-                <button id="messager-file"><span class="material-symbols-rounded">file_present</span></button>
-                <button id="messager-audio"><span class="material-symbols-rounded">keyboard_voice</span></button>
+                <button id="messager-file" class="hidden"><span class="material-symbols-rounded">file_present</span></button>
+                <button id="messager-audio" class="hidden"><span class="material-symbols-rounded">keyboard_voice</span></button>
             </div>
             <span>
                 <textarea id="messager-text" tabindex="2"></textarea>
                 <button id="messager-submit" class="disabled"><span class="material-symbols-rounded">send</span></button>
             </span>
+        </section>
+        <section id="logs">
+            <ul id="logs-list"></ul>
         </section>
     </main>
     <script type="module" src="/scripts/index.js"></script>

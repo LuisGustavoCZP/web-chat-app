@@ -1,10 +1,22 @@
+/**
+ * 
+ * @param {Event} e 
+ * @param {HTMLElement} inputer 
+ * @param {HTMLElement} submiter 
+ * @param {()=>{}} enableCallback 
+ * @param {()=>{}} disableCallback 
+ * @returns 
+ */
 export function inputManager (e, inputer, submiter, enableCallback, disableCallback)
 {
     var key = e.which || e.keyCode;
+    /**
+     * @type {string}
+     */
     const text = inputer.value;
     if(key == 8)
     {
-        if(text.length == 1)
+        if((text.length <= 1 || /^\p{Extended_Pictographic}$/ugm.test(text)) && !submiter.classList.contains("disabled"))
         {
             submiter.classList.add("disabled");
             if(disableCallback) disableCallback();
