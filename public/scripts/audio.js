@@ -129,6 +129,8 @@ class AudioControl extends HTMLElement
         if(audio) this.player = audio;
         this.appendChild(this.#playButton);
         this.appendChild(this.#trackRange);
+
+        this.setAttribute("src", audio.src)
     }
 
     set playing (value)

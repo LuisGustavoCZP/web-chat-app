@@ -53,9 +53,15 @@ function socket (server)
 
         ws.on('message', resp => 
         {
-            const msg = JSON.parse(resp.toString());
-            const event = events[msg.type];
-            if(event) event(msg);
+            try {
+                const msg = JSON.parse(resp.toString());
+                const event = events[msg.type];
+                if(event) event(msg);
+            }
+            catch (e)
+            {
+                console.log(e);
+            }
         });
 
         ws.on('close', () => 

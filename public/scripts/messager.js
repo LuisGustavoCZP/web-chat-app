@@ -116,7 +116,7 @@ function createMessager ()
         const div = document.createElement("div");
         div.style = `background-color:${usersColors.get(msg.id)}`;
 
-        if(type === 2)
+        if(type === 0)
         {
             const title = document.createElement("h4");
             title.innerText = msg.username;
@@ -128,7 +128,7 @@ function createMessager ()
         const msgElement = messageTypes[msg.type](msg.data);
         div.appendChild(msgElement);
 
-        if(type === 2 || type === 1)
+        if(type === 0 || type === 1)
         {
             const time = document.createElement("h6");
             const msgDate = new Date(msg.date);
@@ -246,16 +246,22 @@ function createMessager ()
     async function sendAudio (audio)
     {
         const txt = await blobToBase64(audio)
-
-        console.log(audio);
-        const msg = {
-            type: "audio",
-            data: txt,
-            date: Date.now()
-        };
-
-        appSocket.send(msg);
-        //new Audio ().play();
+        if(txt == "data:") return;
+        try
+        {
+            const test = new Audio (txt);
+            console.log(txt);
+            const msg = {
+                type: "audio",
+                data: txt,
+                date: Date.now()
+            };
+            appSocket.send(msg);
+        }
+        catch (e)
+        {
+            console.log(e);
+        }
     }
 
     function inputMessage(e)
