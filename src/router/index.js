@@ -7,11 +7,11 @@ const router = express.Router();
 
 router.use('/styles/style.css', views.sendGlobalStyle);
 
-router.use('/scripts/input.js', views.sendInputScript);
-
+router.use('/scripts/:script', views.sendScript);
+/* 
 router.use('/scripts/index.js', views.sendIndexScript);
 
-router.use('/scripts/login.js', views.sendLoginScript);
+router.use('/scripts/login.js', views.sendLoginScript); */
 
 router.use('/images/logo.png', views.sendLogoIcon);
 router.use('/favicon.png', views.sendLogoIcon);

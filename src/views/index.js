@@ -1,7 +1,7 @@
 const emojis = require('./emojis');
 const { sendGlobalStyle } = require('./styles');
 const { sendLogoIcon } = require('./images');
-const { sendInputScript, sendIndexScript, sendLoginScript } = require('./scripts');
+const { sendScript } = require('./scripts');
 const { sendLoginPage, sendHomePage } = require('./pages');
 
-module.exports = { emojis, sendGlobalStyle, sendLogoIcon, sendInputScript, sendIndexScript, sendLoginScript, sendLoginPage, sendHomePage }
+module.exports = { emojis, sendGlobalStyle, sendLogoIcon, sendScript, sendLoginPage, sendHomePage }

@@ -7,25 +7,54 @@ body {
     width: 100vw;
     margin: 0;
     flex-direction: column;
-    background-color: rgb(147, 165, 115);
+    
+    background-color: rgb(203, 212, 186);
     overflow: hidden;
 }
 
 header {
     display: flex;
     width: 100%;
-    justify-content: center;
-    box-shadow: 1px 1px 1px black;
-    background-color: rgb(81, 126, 81);
+    justify-content: space-between;
+    box-shadow: 1px 1px 5px black;
+    color: rgb(81, 126, 81);
+    background-color: rgb(21, 32, 21);
     text-transform: uppercase;
     font-family: 'Lobster', cursive;
     user-select: none;
 }
 
-header > img {
+header > .logo
+{
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+header > .logo > img {
     display: flex;
     height: 5rem;
     -webkit-user-drag: none;
+}
+
+
+header > .options {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+}
+
+header > .options > button {
+    margin-right: 25px;
+    height: 4rem;
+    width: 4rem;
+    border-radius: 100%;
+}
+
+header > .options > button > span {
+    font-size: 3rem;
 }
 
 main {
@@ -94,9 +123,11 @@ button > i {
 #messages {
     height: 100%;
     width: 100%;
-    background-color: rgb(203, 212, 186);
+    /*  */
     overflow-x: hidden;
     overflow-y: scroll;
+    
+    scrollbar-width: thin;
 }
 
 #messages-list {
@@ -152,6 +183,7 @@ button > i {
     flex-grow: 1;
     padding: 5px 10px;
     align-items: center;
+    background-color: rgb(147, 165, 115);
 }
 
 #messager > div {

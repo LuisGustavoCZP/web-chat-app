@@ -3,7 +3,7 @@ const fs = require('fs');
 
 function sendGlobalStyle (req, res)
 {
-    const style = fs.readFileSync('./public/style.css');
+    const style = fs.readFileSync('./public/styles/style.css');
     res.set('Content-Type', 'text/css');
     res.write(style);
     res.end();

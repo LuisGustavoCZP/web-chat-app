@@ -1,5 +1,5 @@
 const fs = require('fs');
-const logo = fs.readFileSync('./public/logo.png');
+const logo = fs.readFileSync('./public/images/logo.png');
 
 function sendLogoIcon (req, res)
 {

@@ -1,33 +1,32 @@
 const fs = require('fs');
-const inputScript = fs.readFileSync('./public/input.js');
-//const indexScript = fs.readFileSync('./public/index.js');
-//const loginScript = fs.readFileSync('./public/login.js');
 
-function sendInputScript (req, res) 
+const scriptFiles = {}
+
+function loadScript (name)
 {
-    res.set('Content-Type', 'text/javascript');
-    res.write(inputScript);
-    res.end();
+    if(true || !scriptFiles[name]) 
+    {
+        const filePath = `./public/scripts/${name}`;
+        if(!fs.existsSync(filePath)) scriptFiles[name] = '';
+        else scriptFiles[name] = fs.readFileSync(filePath);
+    }
+    return scriptFiles[name];
 }
 
-function sendIndexScript (req, res)
+function sendScript (req, res) 
 {
-    const indexScript = fs.readFileSync('./public/index.js');
-    res.set('Content-Type', 'text/javascript');
-    res.write(indexScript);
-    res.end();
-}
+    const fileName = req.params["script"];
+    if(!fileName) {res.end(); return;}
+    const match = fileName.match(/^((\w{1,}-){0,}\w{1,})(\.js)$/gim);
+    if(!match) {res.end(); return;}
+    const scriptFile = loadScript(fileName);
+    if(!scriptFile) { res.writeHead(404); res.end(); return; }
 
-function sendLoginScript (req, res)
-{
-    const loginScript = fs.readFileSync('./public/login.js');
     res.set('Content-Type', 'text/javascript');
-    res.write(loginScript);
+    res.write(scriptFile);
     res.end();
 }
 
 module.exports = {
-    sendInputScript,
-    sendIndexScript,
-    sendLoginScript
+    sendScript
 }
