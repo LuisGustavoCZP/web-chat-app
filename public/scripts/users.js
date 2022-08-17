@@ -4,6 +4,7 @@ class WindowUsers extends WindowModal
 {
     #users;
     #userlist;
+    #onclickuser;
 
     constructor ()
     {
@@ -28,18 +29,40 @@ class WindowUsers extends WindowModal
         users.forEach(user => 
         {
             const li = document.createElement("li");
-            if(user.online) li.classList.add("online");
+
+            const click = document.createElement("button");
+            if(user.online) 
+            {
+                li.classList.add("online");
+                click.onclick = () => 
+                {
+                    if(this.#onclickuser) this.#onclickuser(user)
+                };
+            }
+
             const username = document.createElement("span");
             username.classList.add("username");
             username.innerText = user.name;
-            li.appendChild(username);
+            click.appendChild(username);
             const userstatus = document.createElement("span");
             userstatus.classList.add("userstatus");
             userstatus.classList.add("material-symbols-rounded");
             userstatus.innerText = "person";
-            li.appendChild(userstatus);
+            click.appendChild(userstatus);
+
+            li.appendChild(click);
             this.#userlist.appendChild(li);
         });
+    }
+
+    getUser (userid)
+    {
+        return this.#users.find((user) => user.id === userid);
+    }
+
+    set onclickuser (callback)
+    {
+        this.#onclickuser = callback;
     }
 }
 

@@ -42,6 +42,7 @@ function createMessager ()
     const messager = document.getElementById("messager");
     const messagerInput = document.getElementById("messager-text");
     const messagerSubmit = document.getElementById("messager-submit");
+    const messagerPrivate = document.getElementById("messager-private");
 
     const audioButton = document.getElementById("messager-audio");
 
@@ -49,6 +50,7 @@ function createMessager ()
      * @type {string}
      */
     let clientID;
+    let privateTo;
 
     let appSocket = createSocket(enable, disable, receiveMessages, focus);
     audioRecorder.ondisable = () => blockAudio();
@@ -81,6 +83,7 @@ function createMessager ()
         audioRecorder.onclose = (audio) => sendAudio(audio);
         audioButton.onpointerdown = () => audioRecorder.start();
         audioButton.onpointerup = () => audioRecorder.stop();
+        usersWindow.onclickuser = (u) => setPrivate(u);
     }
 
     function disable ()
@@ -90,6 +93,23 @@ function createMessager ()
 
         messagerInput.removeEventListener('keydown', inputMessage);
         messagerSubmit.removeEventListener("click", sendMessage);
+    }
+
+    function setPrivate (privateUser)
+    {
+        privateTo = privateUser;
+        if(privateUser) {
+            messagerPrivate.innerText = `Mandar privado para ${privateUser.name}`;
+            messagerPrivate.onclick = () => {setPrivate(undefined)};
+            if(!messagerPrivate.classList.contains("private")) messagerPrivate.classList.add("private");
+        }
+        else {
+            messagerPrivate.innerText = '';
+            messagerPrivate.onclick = undefined;
+            messagerPrivate.classList.remove("private");
+        }
+
+        console.log(privateTo);
     }
 
     function textMessage (text)
@@ -107,6 +127,7 @@ function createMessager ()
     }
 
     const messageTypes = {
+        "private": textMessage,
         "message": textMessage,
         "audio": audioMessage
     }
@@ -115,11 +136,12 @@ function createMessager ()
     {
         const div = document.createElement("div");
         div.style = `background-color:${usersColors.get(msg.id)}`;
-
-        if(type === 0)
+        const isPrivate = msg.type == "private";
+        const isYours = type === 1;
+        if(!isYours || isPrivate)
         {
             const title = document.createElement("h4");
-            title.innerText = msg.username;
+            title.innerText = isPrivate && isYours ? `Privado (${usersWindow.getUser(msg.private).name})` : isPrivate ? `${msg.username} (privado)` : msg.username;
             title.style = `background-color:${usersColors.get(msg.id)}`;
             div.appendChild(title);
         }
@@ -128,7 +150,7 @@ function createMessager ()
         const msgElement = messageTypes[msg.type](msg.data);
         div.appendChild(msgElement);
 
-        if(type === 0 || type === 1)
+        if(isYours || !isYours)
         {
             const time = document.createElement("h6");
             const msgDate = new Date(msg.date);
@@ -151,21 +173,26 @@ function createMessager ()
         else return 0;
     }
 
+    function renderMessage(msg)
+    {
+        if(!usersColors.has(msg.id))
+        {
+            usersColors.set(msg.id, randomColor());
+        }
+
+        const li = document.createElement("li");
+        const type = messageClass(msg.id);
+        li.classList.add(messageClasses[type]);
+        li.appendChild(createMessage(type, msg));
+        return li;
+    }
+
     function renderMessages(msgs)
     {
         messagesList.innerHTML = '';
         msgs.forEach(msg => 
         {
-            if(!usersColors.has(msg.id))
-            {
-                usersColors.set(msg.id, randomColor());
-            }
-
-            const li = document.createElement("li");
-            const type = messageClass(msg.id);
-            li.classList.add(messageClasses[type]);
-            li.appendChild(createMessage(type, msg));
-            messagesList.appendChild(li);
+            messagesList.appendChild(renderMessage(msg));
         });
 
         messages.scrollTo(0, messages.scrollHeight);
@@ -177,33 +204,35 @@ function createMessager ()
         return `hsla(${hue}, 100%, 75%, .5)`;
     }
 
-    function receiveSetup (data)
+    function receiveSetup (setup)
     {
-        clientID = data;
+        
+        clientID = setup.data;
         usersColors.set(clientID, `hsla(360, 100%, 100%, .5)`);
     }
 
     function receiveChat (data)
     {
         //console.log(data);
-        renderMessages(data);
+        messagesList.appendChild(renderMessage(data));
     }
 
-    function receiveLog (data)
+    function receiveLog (slog)
     {
-        console.log(data);
-        logs.update(data);
+        console.log(slog.data);
+        logs.update(slog.data);
     }
 
-    function receiveUserlist (data)
+    function receiveUserlist (ulist)
     {
-        console.log(data);
-        usersWindow.update(data);
+        console.log(ulist.data);
+        usersWindow.update(ulist.data);
     }
 
     const events = {
         "setup": receiveSetup,
-        "chat": receiveChat,
+        "message": receiveChat,
+        "private": receiveChat,
         "log": receiveLog,
         "userlist": receiveUserlist,
     };
@@ -211,11 +240,12 @@ function createMessager ()
     function receiveMessages(response)
     {
         const responseData = JSON.parse(response.data);
+        console.log(responseData);
         const event = events[responseData.type];
 
         if(event) 
         {
-            event(responseData.data);
+            event(responseData);
         }
     }
 
@@ -230,9 +260,14 @@ function createMessager ()
         }
         
         console.log("Enviando mensagem");
-        const msg = {
+        const msg = !privateTo ? {
             type: "message",
             data: text,
+            date: Date.now()
+        } : {
+            type: "message",
+            data: text,
+            private: privateTo.id,
             date: Date.now()
         };
 

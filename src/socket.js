@@ -41,8 +41,20 @@ function socket (server)
             if(msg["id"]) delete msg["id"];
             msg.id = userid;
             msg.username = user.name;
-            data.addMsg(msg);
-            data.broadcastMsgs();
+
+            console.log(msg);
+            if(!msg.private)
+            {
+                //data.addMsg(msg);
+                data.broadcast(msg);
+            }
+            else
+            {
+                msg.type = "private";
+                data.sendTo(msg.private, msg);
+                data.sendTo(msg.id, msg);
+            }
+            
         };
 
         const events = {

@@ -1,9 +1,9 @@
 const {v4:uuid} = require('uuid');
 
-const msgs = {
+/* const msgs = {
     type: "chat",
     data: [],
-};
+}; */
 
 const users = {};
 const usersConnection = {};
@@ -74,7 +74,7 @@ function connect (userid, connection)
 
     broadcastLog(`${user.name} entrou`);
     broadcastUsers();
-    msgsTo(userid);
+    //msgsTo(userid);
     return userid;
 }
 
@@ -93,7 +93,7 @@ function disconnect (userid)
 function addUser (username)
 {
     const userid = uuid();
-    users[userid] = {name:username, online:true};
+    users[userid] = {id:userid, name:username, online:true};
     return userid;
 }
 
@@ -116,11 +116,11 @@ function removeSession (sessionid)
 }
 
 module.exports = {
-    msgs,
+    /* msgs, */
     users, 
     sessions,
-    addMsg,
-    broadcastMsgs,
+    /* addMsg, */
+    /* broadcastMsgs, */
     addUser,
     removeUser,
     addSession,
@@ -129,5 +129,7 @@ module.exports = {
     disconnect,
     broadcastUsers,
     broadcastLog,
-    msgsTo
+    broadcast,
+    /* msgsTo, */
+    sendTo
 }

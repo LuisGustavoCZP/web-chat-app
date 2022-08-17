@@ -306,7 +306,28 @@ audio-control > input[type=range] {
     align-items: center;
 }
 
-#messager > span > textarea {
+#messager > span > div {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+#messager > span > div > h4 {
+    display: flex;
+    align-items: center;
+    margin: 2px 5px;
+    padding: 0;
+    height: 2rem;
+    font-size: 1rem;
+    user-select: none;
+}
+
+#messager > span > div > h4.private:hover {
+    color: var(--color-lumen);
+    cursor: pointer;
+}
+
+#messager > span > div > textarea {
     display: flex;
     flex-grow: 1;
     height: 100px;
@@ -499,6 +520,12 @@ audio-control > input[type=range] {
     height: fit-content;
     padding: 10px;
     margin: 5px;
+}
+
+.userlist ul > li > button {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .userlist .username {
