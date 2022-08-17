@@ -17,15 +17,27 @@ class WindowUsers extends WindowModal
 
     update (users)
     {
-        this.#users = users;
+        this.#users = users.sort((a, b) => 
+        {
+            if(a.online && !b.online) return -1;
+            if(a.online && b.online) return 0;
+            if(!a.online && b.online) return 1;
+        });
+        
         this.#userlist.innerHTML = '';
         users.forEach(user => 
         {
             const li = document.createElement("li");
+            if(user.online) li.classList.add("online");
             const username = document.createElement("span");
             username.classList.add("username");
-            username.innerText = user;
+            username.innerText = user.name;
             li.appendChild(username);
+            const userstatus = document.createElement("span");
+            userstatus.classList.add("userstatus");
+            userstatus.classList.add("material-symbols-rounded");
+            userstatus.innerText = "person";
+            li.appendChild(userstatus);
             this.#userlist.appendChild(li);
         });
     }

@@ -31,12 +31,7 @@ function socket (server)
             const user = data.users[userid];
             if(!user) return;
 
-            data.addConnection(userid, ws);
-            
-            data.broadcastLog(`${user} entrou`);
-            data.broadcastUsers();
-            data.msgsTo(userid);
-            
+            data.connect(userid, ws);
         };
 
         function receiveMessage (msg)
@@ -45,7 +40,7 @@ function socket (server)
             if(!user) return;
             if(msg["id"]) delete msg["id"];
             msg.id = userid;
-            msg.username = user;
+            msg.username = user.name;
             data.addMsg(msg);
             data.broadcastMsgs();
         };
@@ -62,14 +57,9 @@ function socket (server)
             if(event) event(msg);
         });
 
-        ws.on('close', () => {
-            const user = data.users[userid];
-            if(user) 
-            {
-                data.removeConnection(userid);
-                data.broadcastLog(`${user} saiu`);
-                data.broadcastUsers();
-            }
+        ws.on('close', () => 
+        {
+            data.disconnect(userid);
             console.log(`Client disconnected with id:${userid}.`);
         });
     });

@@ -394,6 +394,7 @@ button > i {
 
 .userlist ul {
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
     list-style: none;
     padding: 0;
@@ -411,9 +412,21 @@ button > i {
 }
 
 .userlist .username {
-    color: var(--color-blindme);
+    color: red;
     font-size: medium;
     font-weight: 700;
+}
+
+.userlist li.online .username {
+    color: var(--color-blindme);
+}
+
+.userlist .userstatus {
+    color: red;
+}
+
+.userlist li.online .userstatus {
+    color: var(--color-blindme);
 }
 
 .hidden {

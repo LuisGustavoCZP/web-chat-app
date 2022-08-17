@@ -64,28 +64,43 @@ function broadcastUsers ()
     broadcast(usermsg);
 }
 
+function connect (userid, connection)
+{
+    const user = users[userid];
+    if(!user) return;
+
+    usersConnection[userid] = connection;
+    user.online = true;
+
+    broadcastLog(`${user.name} entrou`);
+    broadcastUsers();
+    msgsTo(userid);
+    return userid;
+}
+
+function disconnect (userid)
+{
+    delete usersConnection[userid];
+    
+    const user = users[userid];
+    if(!user) return;
+    user.online = false;
+
+    broadcastLog(`${user.name} saiu`);
+    broadcastUsers();
+}
+
 function addUser (username)
 {
     const userid = uuid();
-    users[userid] = username;
+    users[userid] = {name:username, online:true};
     return userid;
-}
-
-function addConnection (userid, connection)
-{
-    usersConnection[userid] = connection;
-    return userid;
-}
-
-function removeConnection (userid)
-{
-    delete usersConnection[userid];
 }
 
 function removeUser (user)
 {
-    delete users[user.id];
     delete usersConnection[user.id];
+    delete users[user.id];
 }
 
 function addSession (userid)
@@ -110,8 +125,8 @@ module.exports = {
     removeUser,
     addSession,
     removeSession,
-    addConnection,
-    removeConnection,
+    connect,
+    disconnect,
     broadcastUsers,
     broadcastLog,
     msgsTo
