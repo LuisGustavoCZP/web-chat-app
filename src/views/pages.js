@@ -25,6 +25,7 @@ function sendHomePage (req, res)
 
     const homePage = fs.readFileSync('./public/index.html');
 
+    /* res.header("Feature-Policy: microphone 'self' *"); */
     res.writeHead(200);
     res.write(homePage);
     res.end();

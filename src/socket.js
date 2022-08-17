@@ -47,6 +47,7 @@ function socket (server)
 
         const events = {
             "message": receiveMessage,
+            "audio": receiveMessage,
             "session": receiveSession
         }
 

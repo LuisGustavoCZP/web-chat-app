@@ -2,10 +2,36 @@ import {inputManager} from './input.js';
 import createSocket from "./socket.js";
 import usersWindow from "./users.js";
 import logs from "./logs.js";
+import {audioRecorder, AudioControl} from "./audio.js"
 
 function ortoDigits (num)
 {
     return (num).toLocaleString('pt-BR', {minimumIntegerDigits: 2, useGrouping:false});
+}
+
+/**
+ * 
+ * @param {Blob} blob 
+ * @returns {Promise<text>}
+ */
+async function blobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+}
+
+function b64toBlob(dataURI) {
+    
+    var byteString = atob(dataURI.split(',')[1]);
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return [ab];
 }
 
 function createMessager ()
@@ -17,22 +43,31 @@ function createMessager ()
     const messagerInput = document.getElementById("messager-text");
     const messagerSubmit = document.getElementById("messager-submit");
 
+    const audioButton = document.getElementById("messager-audio");
+
     /**
      * @type {string}
      */
     let clientID;
 
     let appSocket = createSocket(enable, disable, receiveMessages, focus);
-
+    audioRecorder.ondisable = () => blockAudio();
     /**
      * @type {Map<string, string>}
      */
     const usersColors = new Map();
-    usersColors.set('system', `unset`);
 
     function start ()
     {
         appSocket.start();
+    }
+
+    function blockAudio ()
+    {
+        audioButton.classList.add("disabled");
+        audioRecorder.onclose = undefined;
+        audioButton.onpointerdown = undefined;
+        audioButton.onpointerup = undefined;
     }
 
     function enable ()
@@ -42,6 +77,10 @@ function createMessager ()
 
         messagerInput.addEventListener('keydown', inputMessage);
         messagerSubmit.addEventListener("click", sendMessage);
+
+        audioRecorder.onclose = (audio) => sendAudio(audio);
+        audioButton.onpointerdown = () => audioRecorder.start();
+        audioButton.onpointerup = () => audioRecorder.stop();
     }
 
     function disable ()
@@ -51,6 +90,25 @@ function createMessager ()
 
         messagerInput.removeEventListener('keydown', inputMessage);
         messagerSubmit.removeEventListener("click", sendMessage);
+    }
+
+    function textMessage (text)
+    {
+        const p = document.createElement("p");
+        p.innerText = text;
+        return p;
+    }
+
+    function audioMessage (audio64)
+    {
+        const audio = document.createElement("audio-control");
+        audio.build (new Audio(audio64));
+        return audio;
+    }
+
+    const messageTypes = {
+        "message": textMessage,
+        "audio": audioMessage
     }
 
     function createMessage (type, msg)
@@ -66,9 +124,9 @@ function createMessager ()
             div.appendChild(title);
         }
 
-        const p = document.createElement("p");
-        p.innerText = msg.text;
-        div.appendChild(p);
+        console.log(msg)
+        const msgElement = messageTypes[msg.type](msg.data);
+        div.appendChild(msgElement);
 
         if(type === 2 || type === 1)
         {
@@ -83,16 +141,14 @@ function createMessager ()
     }
 
     const messageClasses = [
-        "message-system",
-        "message-send",
-        "message-received"
+        "message-received",
+        "message-send"
     ];
 
-    function messageType (msgid)
+    function messageClass (msgid)
     {
-        if(msgid === "system") return 0;
-        else if(msgid === clientID) return 1;
-        else return 2;
+        if(msgid === clientID) return 1;
+        else return 0;
     }
 
     function renderMessages(msgs)
@@ -106,7 +162,7 @@ function createMessager ()
             }
 
             const li = document.createElement("li");
-            const type = messageType(msg.id);
+            const type = messageClass(msg.id);
             li.classList.add(messageClasses[type]);
             li.appendChild(createMessage(type, msg));
             messagesList.appendChild(li);
@@ -176,11 +232,30 @@ function createMessager ()
         console.log("Enviando mensagem");
         const msg = {
             type: "message",
-            text: text,
+            data: text,
             date: Date.now()
         };
 
         appSocket.send(msg);
+    }
+
+    /**
+     * 
+     * @param {Blob} audio 
+     */
+    async function sendAudio (audio)
+    {
+        const txt = await blobToBase64(audio)
+
+        console.log(audio);
+        const msg = {
+            type: "audio",
+            data: txt,
+            date: Date.now()
+        };
+
+        appSocket.send(msg);
+        //new Audio ().play();
     }
 
     function inputMessage(e)
