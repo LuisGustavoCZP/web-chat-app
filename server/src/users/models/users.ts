@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import * as models from "../../base/models";
-import { settings } from "../../base";
+import { IWhere, settings } from "../../base";
 import { UserValidator } from "../validators";
 
 export class User extends models.Model
@@ -8,14 +8,15 @@ export class User extends models.Model
     email : string;
     name : string;
     password : string;
+    avatar: string;
 
     constructor (data : any)
     {
-        super();
+        super(data);
         this.email = data.email;
         this.name = data.name;
         this.password = data.password;
-        if(data.id) this.id = data.id;
+        this.avatar = data.avatar;
     }
 
     public override get tableName () 
@@ -23,7 +24,7 @@ export class User extends models.Model
         return 'users';
     }
 
-    public static override async filter(data?: { [key: string]: string; } | undefined): Promise<User[]> 
+    public static override async filter(data?: IWhere): Promise<User[]> 
     {
         return (await super.filter(data)).map(value => new User(value));
     }
@@ -45,7 +46,11 @@ export class User extends models.Model
 
     protected override async update()
     {
-        this.password = await bcrypt.hash(this.password, settings.hashSecret);
+        /* if(this.password)
+        {
+            const data = await bcrypt.hash(this.password, settings.hashSecret);
+            this.password = data;
+        } */
         return super.update();
     }
 

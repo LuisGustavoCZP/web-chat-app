@@ -9,7 +9,7 @@ export class UserValidator extends Validator
 
         this.data.email = this.checkEmail(data.email);
         this.data.name = this.checkName(data.name);
-        this.data.password = this.checkPassword(data.password);
+        //this.data.password = this.checkPassword(data.password);
     }
 
     checkEmail (email : string)

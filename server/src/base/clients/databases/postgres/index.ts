@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { databaseConfig } from "../../../settings";
 import { Database } from "../models";
+import { IObject, IWhere } from "../interfaces";
 
 export class Postgres extends Database
 {
@@ -17,6 +18,46 @@ export class Postgres extends Database
         return this._pool;
     }
 
+    public async createTable (name: string, columns: string[], extras?: string[])
+    {
+        const columnsQuery = columns.map((column) => {
+            return `\t${column}`;
+        }).join(",\n");
+
+        const extraQuery = extras ? extras.join(";\n") : "";
+
+        const queryString = `
+            CREATE TABLE IF NOT EXISTS ${name} (
+            ${columnsQuery}
+            );
+            ${extraQuery}
+        `;
+        /* console.log(queryString); */
+        
+        return (await this.query(queryString)).rows;
+    }
+
+    public async createTrigger (name: string, table: string, method: string, procedure: string)
+    {
+        const queryString = `
+            CREATE FUNCTION procedure_${name}(integer) 
+                RETURNS TRIGGER 
+                LANGUAGE PLPGSQL  
+                AS
+            $$
+            BEGIN
+                ${procedure}
+            END;
+            $$
+
+            CREATE TRIGGER ${name}
+                AFTER ${method}
+                ON ${table}
+                EXECUTE PROCEDURE procedure_${name}();
+        `;
+        return (await this.query(queryString)).rows;
+    }
+
     public query (q : string, values? : any[])
     {
         if(values)
@@ -24,7 +65,7 @@ export class Postgres extends Database
         return this._pool.query(q);
     }
 
-    public async insert (table: string, atributes: any): Promise<any[]>
+    public async insert (table: string, atributes: IObject): Promise<any[]>
     {
         try 
         {
@@ -32,8 +73,8 @@ export class Postgres extends Database
             const indexes = keys.map((value, index) => `$${index+1}`);
             const values = Object.values(atributes as any);
     
-            const queryString = `INSERT INTO ${table} (${keys.join(', ')}, created_at) VALUES (${indexes.join(', ')}, now()) RETURNING *`;
-            //console.log(queryString);
+            const queryString = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${indexes.join(', ')}) RETURNING *`;
+            /* console.log(queryString); */
 
             return (await this.query(queryString, values)).rows[0];
         }
@@ -56,16 +97,18 @@ export class Postgres extends Database
         }
     }
 
-    public async filter (table: string, filter?: any): Promise<any[]>
+    public async select (table: string, filter?: IWhere): Promise<any[]>
     {
         try 
         {
-            const filterString = filter ? ` WHERE ${Object.entries(filter as any).map((value) => `(${value[0]}='${value[1]}')`).join(",")}` : '';
+            const filterEntries = filter ? Array.from(Object.entries(filter)) : null;
+            const filterString = filterEntries ? ` WHERE ${filterEntries.map(([key, {type}], i) => `${i > 0 ? ` ${type || "AND"} ` : ""}(${key}=$${1+i})`).join("\n")}` : '';
+            const values = filterEntries ? filterEntries.map(([, {value}]) => value) : [];
 
             const queryString = `SELECT * FROM ${table}${filterString}`;
-            //console.log(queryString);
+            /* console.log(queryString); */
 
-            return (await this.query(queryString)).rows;
+            return (await this.query(queryString, values)).rows;
         }
         catch (e)
         {
@@ -75,17 +118,25 @@ export class Postgres extends Database
         }
     }
 
-    public async update (table: string, filter: any, atributes: any): Promise<any[]>
+    public async update (table: string, atributes: IObject, filter?: IWhere): Promise<any[]>
     {
         try 
         {
-            const filterString = `WHERE ${Object.entries(filter as any).map((value) => `${value[0]}='${value[1]}'`).join(",")}`;
-            const atributesString = `${Object.entries(atributes as any).map((value) => `${value[0]}='${value[1]}'`).join(",")}`;
+            const filterEntries = filter ? Array.from(Object.entries(filter)) : null;
+            const filterString = filterEntries ? ` WHERE ${filterEntries.map(([key, {type}], i) => `${i > 0 ? ` ${type || "AND"} ` : ""}(${key}=$${1+i})`).join("\n")}` : '';
+            const values = filterEntries ? filterEntries.map(([, {value}]) => value) : [];
+            const vs = values.length;
 
-            const queryString = `UPDATE ${table} SET updated_at=now(), ${atributesString} ${filterString} RETURNING *`;
-            //console.log(queryString);
+            const atributesString = `${Object.entries(atributes).map(([key, value], i) => 
+            {
+                values.push(value);
+                return `${key}=$${1+i+vs}`;
+            }).join(",")}`;
 
-            return (await this.query(queryString)).rows;
+            const queryString = `UPDATE ${table} SET ${atributesString} ${filterString} RETURNING *`;
+            /* console.log(queryString); */
+
+            return (await this.query(queryString, values)).rows;
         }
         catch (e)
         {
@@ -95,9 +146,26 @@ export class Postgres extends Database
         }
     }
 
-    public async delete (table: string, id : string): Promise<any[]>
+    public async delete (table: string, filter?: IWhere): Promise<any[]>
     {
-        //const queryString = `UPDATE ${table} SET deleted_at=now()${deleted_by==''?'':`${deletedName}_by=$1`}${filterstring==''?'':' WHERE '+filterstring} RETURNING *`;
-        return [];
+        try 
+        {
+            const filterEntries = filter ? Array.from(Object.entries(filter)) : null;
+            const filterString = filterEntries ? ` WHERE ${filterEntries.map(([key, {type}], i) => `${i > 0 ? ` ${type || "AND"} ` : ""}(${key}=$${1+i})`).join("\n")}` : '';
+            const values = filterEntries ? filterEntries.map(([, {value}]) => value) : [];
+
+            const queryString = `DELETE FROM ${table} ${filterString} RETURNING *`;
+            /* console.log(queryString); */
+
+            return (await this.query(queryString, values)).rows;
+        }
+        catch (e : any)
+        {
+            const message = (e).message;
+            console.log(message);
+            throw new Error("503|internal:service temporarily unavailable");
+        }
     }
 }
+
+//Object.entries(filter)

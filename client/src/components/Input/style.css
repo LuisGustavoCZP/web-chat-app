@@ -1,0 +1,29 @@
+.Input {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    
+}
+
+.Input > input {
+    background-color: var(--color-light0);
+    padding: 5px 10px;
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: var(--color-dark1);
+    color: var(--color-dark1);
+    outline: 0;
+}
+
+.Input > input:hover {
+    color: var(--color-grow1);
+    border-color: var(--color-medium1);
+}
+
+.Input > input:focus, 
+.Input > input:focus-visible,
+.Input > input:active {
+    color: var(--color-dark0);
+    border-color: var(--color-grow1);
+    outline: 0;
+}

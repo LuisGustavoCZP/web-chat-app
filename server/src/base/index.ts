@@ -1,14 +1,15 @@
-import express from "express";
+import express, { Router } from "express";
 import * as settings from "./settings";
 import cookieParser from 'cookie-parser';
 import cors from "cors";
-import { SocketServer } from "./socket";
 import { Server } from "./server";
 import { router } from "./routes";
+import { SocketServer } from "./clients";
 
+export * from "./utils";
 export * as validators from "./validators";
 export * as models from "./models";
-export * as client from "./clients";
+export * from "./clients";
 export { router };
 export { settings };
 
@@ -17,6 +18,7 @@ class App
     app : express.Application;
     server : Server;
     socketServer : SocketServer;
+    router : Router;
 
     constructor ()
     {
@@ -27,7 +29,8 @@ class App
         this.app.use(express.urlencoded({ extended: true}));
         this.app.use(cors(settings.corsOptions));
 
-        this.app.use(router);
+        this.router = router;
+        this.app.use("/api", this.router);
 
         this.server = new Server(this.app, settings);
         this.socketServer = new SocketServer(this.server);
@@ -37,5 +40,6 @@ class App
 }
 
 const app = new App ();
+(globalThis as any).app = app;
 
 export { app }

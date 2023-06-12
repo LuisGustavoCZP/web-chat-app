@@ -1,0 +1,20 @@
+.ChatControl {
+    display: flex;
+    flex-grow: 1;
+    border-top: 1px solid var(--color-dark2);
+}
+
+.ChatControl > .Form {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--color-light1);
+}
+
+.ChatControl > .Form textarea {
+    display: flex;
+    flex-grow: 1;
+    height: 140px;
+}

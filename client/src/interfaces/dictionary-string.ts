@@ -1,0 +1,1 @@
+export type IDictionaryString = {[key: string] : any};

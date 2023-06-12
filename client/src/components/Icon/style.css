@@ -1,0 +1,7 @@
+.Icon {
+    cursor: default;
+}
+
+.Icon.clickable {
+    cursor: pointer;
+}

@@ -4,6 +4,6 @@ export class NameValidator extends RegexValidator
 {
     protected override get regexp ()
     {
-        return /^([a-z]{1,})([ ]{1}[a-z]{1,}){0,}$/gim;
+        return /^([a-z]{1,})([ ]{1}[a-z]{1,}(\.?)){0,}$/gim;
     }
 }
