@@ -13,7 +13,7 @@ import { createDatabase } from "./database";
 
 dotenv.config()
 
-const port = Number(env.PORT) || 8080;
+const port = 8080;
 const isSsl = env.SSL ? env.SSL == "true" : false;
 
 const hashSecret = genSaltSync(10);
