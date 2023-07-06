@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo-whatsapp2.png";
 import { Avatar } from "../Avatar";
 import { Icon } from "../Icon";
 import "./style.css";
