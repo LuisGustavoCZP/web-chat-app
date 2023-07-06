@@ -9,40 +9,48 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - PGDATA=/data/postgres
-    volumes: 
-#      - ./constructor.sql:/docker-entrypoint-initdb.d/constructor.sql
+    volumes:
       - db:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:5432"
     networks:
-      main:
-        aliases:
-          - postgres
+      - main
     restart: unless-stopped
 
+  server-webchat:
+    container_name: server-webchat
+    restart: always
+    depends_on: 
+      - postgres-webchat
+    build: ./brbot-web/server
+    ports:
+      - "${PORT}:8080"
+    env_file: .env
+    environment:
+      - SSL=${SSL}
+      - HASH_SECRET=${HASH_SECRET}
+    #volumes:
+    #  - ./brbot-web/server/static/assets:/static/assets
+    networks:
+      - main
+
   nginx-webchat:
-    #build: ./brbot-web/react
-    image: nginx:latest
+    build: ./client
+    #image: nginx:latest
     container_name: nginx-webchat
     restart: unless-stopped
     ports:
       - 443:443
-    #links:
-    #  - brbotweb:brbotweb
-    #  - brbot:brbot
-    #  - brbotsum:brbotsum
-    #depends_on:
-    #  - brbot
-    #  - brbotweb
-    #  - brbotsum
+    links:
+      - server-webchat:server-webchat
+    depends_on:
+      - server-webchat
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./security/keys/:/ssl/
-      - ./public/:/usr/share/nginx/html
+      #- ./public/:/usr/share/nginx/html
     networks:
-      main:
-        aliases:
-          - nginx
+      - main
           
 networks:
   main:
