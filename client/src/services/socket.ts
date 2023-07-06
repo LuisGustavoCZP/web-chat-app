@@ -17,8 +17,7 @@ export class SocketService
     
     async start ()
     {
-        console.log("Protocol", window.location.protocol);
-        this.socket = new WebSocket(`ws${window.location.protocol == "https"?"s":""}://${window.location.hostname}:8080/ws`, ["https", "http"]);
+        this.socket = new WebSocket(`ws${window.location.protocol == "https:"?"s":""}://${window.location.hostname}:8080/ws`, ["https", "http"]);
         this.socket.addEventListener("open", (event) => this.onOpened(event));
         this.socket.addEventListener("close", (event) => this.onClosed(event));
         await new Promise((resolve) => this.listeners.set("opened", resolve));
