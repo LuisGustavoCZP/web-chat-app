@@ -1,0 +1,6 @@
+images (file saving)
+cookie (with avatar url)
+
+groups
+friendlist
+messages (persistent)

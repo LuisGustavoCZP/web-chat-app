@@ -1,0 +1,126 @@
+.ChatContent {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-light0);
+    width: 100%;
+    flex-grow: 1;
+    /* padding: 10px; */
+    /* border-radius: 8px; */
+    box-sizing: border-box;
+    
+    /* border-radius: 0px 8px 8px 0px; */
+}
+
+.ChatContent > .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-dark2);
+    padding: 10px 30px;
+    gap: 10px;
+    background-color: var(--color-light1);
+    user-select: none;
+    height: 55px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.ChatContent > .header > h4 {
+    display: flex;
+    justify-content: start;
+    flex-grow: 1;
+    margin: 0;
+}
+
+.ChatContent > .messages {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    flex-grow: 1;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: white;
+    scroll-behavior: auto;
+}
+
+.ChatContent > .messages > ul {
+    display: flex;
+    list-style: none;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px 8px;
+    gap: 8px;
+    width: 100%;
+}
+
+.ChatContent > .messages > ul > li {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+}
+
+.ChatContent > .messages::-webkit-scrollbar {
+    background-color: var(--color-light0);
+    width: 5px;
+}
+
+.ChatContent > .messages::-webkit-scrollbar-thumb {
+    background-color: var(--color-light2);
+    width: 5px;
+}
+
+.ChatContent > .messages > ul > li > .ChatMessage {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: var(--color-light1);
+    overflow: hidden;
+    border-radius: 0px 16px 16px 16px;
+}
+
+.ChatMessage > .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+}
+
+.ChatMessage > .time {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.ChatMessage > .text {
+    display: flex;
+    justify-content: start;
+    text-align: start;
+    /* background-color: var(--color-light0); */
+    padding: 5px 10px;
+    border-radius: 16px;
+}
+
+.ChatContent > .messages > ul > li.owner {
+    flex-direction: row-reverse;
+}
+
+.ChatContent > .messages > ul > li.owner > .ChatMessage {
+    /* background-color: var(--color-light1); */
+    border-radius: 16px 0px 16px 16px;
+}
+
+.ChatContent > .messages > ul > li.owner > .ChatMessage > .text {
+    justify-content: end;
+}
+
+.ChatContent > .messages > ul > li.owner > .ChatMessage > .user {
+    flex-direction: row-reverse;
+}
+
+.ChatContent > .messages li.owner > .ChatMessage > .time {
+    flex-direction: row;
+}

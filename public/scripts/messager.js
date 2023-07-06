@@ -232,6 +232,7 @@ function createMessager ()
     const events = {
         "setup": receiveSetup,
         "message": receiveChat,
+        "audio": receiveChat,
         "private": receiveChat,
         "log": receiveLog,
         "userlist": receiveUserlist,
@@ -241,6 +242,7 @@ function createMessager ()
     {
         const responseData = JSON.parse(response.data);
         console.log(responseData);
+
         const event = events[responseData.type];
 
         if(event) 

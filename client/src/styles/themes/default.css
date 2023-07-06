@@ -1,0 +1,51 @@
+:root {
+    --color-light0: #f0fde9;
+    --color-light1: #e2ffd2;
+    --color-light2: #ccffb0;
+    --color-medium0: #b8ff92;
+    --color-medium1: #a3ff71;
+    --color-grow0: #94ff5a;
+    --color-grow1: #83ff41;
+    --color-dark0: #4f8631;
+    --color-dark1: #305c19;
+    --color-dark2: #172c0c;
+}
+
+button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 1.2em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--color-dark2);
+    cursor: pointer;
+    transition: border-color 0.25s;
+    user-select: none;
+}
+
+button:hover {
+  border-color: var(--color-grow1);
+}
+
+button:focus,
+button:focus-visible,
+button:active {
+  border-color: var(--color-grow1);
+}
+
+
+  
+@media (prefers-color-scheme: light) {
+  :root {
+    color: var(--color-dark2);
+    background-color: var(--color-light0);
+  }
+  a:hover {
+    color: var(--color-grow1);
+  }
+  button {
+    background-color: var(--color-light0);
+  }
+}
+  

@@ -75,7 +75,8 @@ customElements.define("window-emoji", WindowEmoji);
 async function createEmojiWindow (group)
 {
     const emojisResp = await fetch(`/emojis/${group?group:''}`).then(resp => resp.json()); 
-    emojisResp.forEach(emojisCat => {
+    
+    Object.entries(emojisResp).forEach(emojisCat => {
         const catname = emojisCat[0];
         categories.push(catname);
         emojis[catname] = emojisCat[1];
