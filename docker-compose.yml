@@ -14,7 +14,9 @@ services:
     ports:
       - "${DB_PORT}:5432"
     networks:
-      - main
+      main:
+        aliases:
+          - postgres-webchat
     restart: unless-stopped
 
   server-webchat:
@@ -27,12 +29,19 @@ services:
       - "${PORT}:8080"
     env_file: .env
     environment:
-      - SSL=${SSL}
+      - DB_HOST=postgres-webchat
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      #- SSL=${SSL}
       - HASH_SECRET=${HASH_SECRET}
     #volumes:
     #  - ./brbot-web/server/static/assets:/static/assets
     networks:
-      - main
+      main:
+        aliases:
+          - server-webchat
 
   nginx-webchat:
     build: ./client
@@ -50,7 +59,9 @@ services:
       - ./security/keys/:/ssl/
       #- ./public/:/usr/share/nginx/html
     networks:
-      - main
+      main:
+        aliases:
+          - nginx
           
 networks:
   main:
