@@ -22,7 +22,7 @@ services:
     restart: always
     depends_on: 
       - postgres-webchat
-    build: ./brbot-web/server
+    build: ./server
     ports:
       - "${PORT}:8080"
     env_file: .env
