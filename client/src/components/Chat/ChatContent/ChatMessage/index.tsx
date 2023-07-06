@@ -5,7 +5,6 @@ export function ChatMessage ({message} : {message : IMessage})
 {
     const {text, owner, time} = message;
 
-
     return (
         <div className="ChatMessage">
             <span className="user">
@@ -13,7 +12,7 @@ export function ChatMessage ({message} : {message : IMessage})
                 <span>{owner.name}</span>
             </span>
             <span className="text">{text}</span>
-            <span className="time">{time.toLocaleString()}</span>
+            <span className="time">{time.toLocaleTimeString()}</span>
         </div>
     );
 }

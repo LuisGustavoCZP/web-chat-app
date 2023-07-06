@@ -11,7 +11,8 @@ export function useChatContext ()
         users,
         chatData,
         setChatData,
+        onlineUsers,
     } = useContext(ChatContext);
 
-    return {user, users, selectedOption, setSelectedOption, chatData, setChatData, socket};
+    return {user, users, selectedOption, setSelectedOption, chatData, setChatData, socket, onlineUsers};
 }

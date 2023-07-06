@@ -19,7 +19,7 @@ export class ChatSession
 
     async trigger (socketData?: IWebData)
     {
-        console.log("Acionou", socketData)
+        console.log(`\nTrigger Event: ${socketData?.type}\nSession: ${this.id}\nTime:${socketData?.time}\n`)
         if(!socketData?.type) return;
         const ls = this.listeners.get(socketData.type);
         if(ls) ls.forEach(listener => listener(this, socketData));
@@ -37,7 +37,8 @@ export class ChatSession
     async start ()
     {
         this.socket.on("message", (data: any) => this.onMessage(data));
-        
+        this.socket.onclose = (data: any) => this.onClosed(data);
+
         const msg = {
             type:"session",
             time:new Date(),
@@ -45,12 +46,12 @@ export class ChatSession
                 sessionid: this.id
             }
         };
-        this.send(msg);
+
+        await this.send(msg);
     }
 
     async send (data: IWebData | undefined)
     {
-        console.log("Sending", data);
         this.socket.send(JSON.stringify(data));
     }
 
@@ -59,11 +60,16 @@ export class ChatSession
         try {
             const msg : IWebData = JSON.parse(data.toString());
             console.log(typeof msg, msg);
-            this.trigger(msg);
+            await this.trigger(msg);
         }
         catch (e : any)
         {
             console.log(e.message);
         }
+    }
+
+    async onClosed (data: any)
+    {
+        await this.trigger({type: "closed", time: new Date()});
     }
 }

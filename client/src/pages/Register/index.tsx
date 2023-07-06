@@ -25,24 +25,24 @@ export function Register ()
         <main>
             <Panel>
                 <h2>Register</h2>
-                <Form submitText="Registrar" callback={callback} success={success}>
+                <Form submitButton="Registrar" callback={callback} success={success}>
                     <Input
                         type="text"
                         name="email"
                         placeholder="Email"
-                        pattern={{
+                        /* pattern={{
                             regex:/^\w*@gmail\.com(\.\w{2})?$/gim, 
                             error:"O email digitado não é válido!"
-                        }}
+                        }} */
                     />
                     <Input
                         type="text"
                         name="name"
                         placeholder="Nome"
-                        pattern={{
+                        /* pattern={{
                             regex:/\w*@gmail\.com(\.\w{2})?/gim, 
                             error:"O email digitado não é válido!"
-                        }}
+                        }} */
                     />
                     <Input
                         type="password"

@@ -1,3 +1,3 @@
-import { IMessage } from "./message";
+import { IMessageData } from "./socket-data";
 
-export type IChatData = {[key: string] : IMessage[]};
+export type IChatData = {[key: string] : IMessageData[]};

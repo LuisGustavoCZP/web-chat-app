@@ -1,11 +1,9 @@
-import { CookieOptions, Request, Response } from "express";
-import { APIResponse, settings } from "../../../base";
+import { Request, Response } from "express";
+import { APIResponse } from "../../../base";
 import { IUser } from "../../interfaces";
 import { User } from "../../models";
-import jwt from "jsonwebtoken";
-//import * as data from '../../base/socket/data';
+import { setAuthCookie } from "../../services";
 
-const {tokenExpiration, tokenSecret} = settings;
 
 async function login (req : Request, res : Response) 
 {
@@ -32,14 +30,8 @@ async function login (req : Request, res : Response)
         {
             throw new Error("400|user:password does't match");
         }
-        /* const {id, name, email} = user; */
-        const userInfo = {id:user.id, name:user.name, email:user.email};
-        const token = jwt.sign(userInfo, tokenSecret);
-
-        const cookieOptions : CookieOptions = {secure:true, sameSite:"none"};
-        if(tokenExpiration) cookieOptions["expires"] = new Date(Date.now()+tokenExpiration);
-
-        res.cookie("auth", token, cookieOptions);
+        
+        const userInfo = setAuthCookie(user, res);
 
         return APIResponse.sucess(res, {...userInfo, avatar:user.avatar}, 200);
     }

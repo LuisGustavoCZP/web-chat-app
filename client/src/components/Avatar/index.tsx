@@ -1,8 +1,10 @@
+import { Icon } from "../Icon";
 import "./style.css";
 
-export function Avatar ({src} : {src?:string})
+
+export function Avatar ({src, onClick} : {src?:string, onClick? : () => void})
 {
     return (
-        <img className="Avatar" src={src || "./avatar.png"}/>
+        <Icon className="Avatar" image src={src || "./avatar.png"} onClick={onClick}/>
     );
 }

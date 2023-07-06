@@ -8,7 +8,7 @@
     box-sizing: border-box;
     background-color: var(--color-light1);
     border-right: 1px solid var(--color-dark1);
-    
+    overflow: hidden;
     /* border: 1px solid var(--color-dark1); */
     /* border-radius: 8px 0px 0px 8px; */
 }
@@ -57,11 +57,16 @@
     border-radius: 4px;
     gap: 10px;
     transition: .3s ease-in-out;
+    filter:grayscale(100%);
 }
 
 .ChatOption:hover, .ChatOption.active {
     background-color: var(--color-dark2);
     color: var(--color-grow1);
+}
+
+.ChatOption.online {
+    filter:grayscale(0%);
 }
 
 .ChatOption > span {

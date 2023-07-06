@@ -9,7 +9,7 @@ export function Logout ()
     async function onLoad ()
     {
         const response = await logout();
-        if(!response.messages.length)
+        if(!response.messages?.length)
         {
             console.log("Logout!");
             if(setUser) setUser(undefined);

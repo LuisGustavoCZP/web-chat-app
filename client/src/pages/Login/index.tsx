@@ -28,15 +28,15 @@ export function Login ()
         <main>
             <Panel>
                 <h2>Login</h2>
-                <Form submitText="Entrar" callback={callback} success={success}>
+                <Form submitButton="Entrar" callback={callback} success={success}>
                     <Input 
                         type="text" 
                         name="email" 
                         placeholder="Email" 
-                        pattern={{
+                        /* pattern={{
                             regex:/\w*@gmail\.com(\.\w{2})?/gim, 
                             error:"O email digitado não é válido!"
-                        }}
+                        }} */
                     />
                     <Input 
                         type="password" 

@@ -11,6 +11,8 @@ export class SocketService
         this.socket = null;
         this.listeners = new Map<string, ISocketAction>();
         this.opened = false;
+
+        console.log("Criando servidor socket!")
     }
     
     async start ()
@@ -63,7 +65,7 @@ export class SocketService
     onMessage (event: MessageEvent)
     {
         const data : ISocketData = JSON.parse(event.data);
-        /* console.log("Received", data, typeof event.data); */
+        console.log("Received", data, typeof event.data);
         this.trigger(data.type, data);
     }
 
@@ -82,8 +84,8 @@ export class SocketService
             if(action) action(data);
         }
     }
-
-    on (type: string, callback : (data : IMessageData) => Promise<void>)
+// | IMessageData
+    on (type: string, callback : (data : any) => Promise<void>)
     {
         this.listeners.set(type, callback);
     }

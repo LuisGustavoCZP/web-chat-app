@@ -21,44 +21,41 @@ export class ChatSystem
         this.users = new Map<string, string> ();
 
         socketServer.addTrigger("message", (ws: Socket, data?: IWebData) => this.userMessage(ws, data));
-        socketServer.addTrigger("connected", (ws: Socket, data?: IWebData) => this.userConnect(ws, data));
-        socketServer.addTrigger("disconnected", (ws: Socket, data?: IWebData) => this.userDisconnect(ws, data));
+        //socketServer.addTrigger("connected", (ws: Socket, data?: IWebData) => this.userConnect(ws, data));
+        //socketServer.addTrigger("disconnected", (ws: Socket, data?: IWebData) => this.userDisconnect(ws, data));
     }
 
     async userConnect(ws: Socket, socketData?: IWebData)
     {
-        console.log("Usuario conectado!");
+        console.log("\nUsuario conectado!");
     }
 
     async userDisconnect(ws: Socket, socketData?: IWebData)
     {
-        console.log("Usuario desconectado!");
+        console.log("\nUsuario desconectado!");
     }
 
     async userMessage(ws: Socket, socketData?: IWebData)
     {
         if(!socketData) return;
-        console.log("Receive", socketData);
         
         if(socketData.type === "session") 
         {
-            console.log("Recebeu sessão");
             const id = socketData.data?.userid;
-            console.log("ID", id)
             if(!id) return;
 
             const session = await this.createSession(ws, id);
-            
+            console.log(`\nUsuario conectado!\nID: ${id}\nSession: ${session.id}\nTime:${new Date()}\n`);
+
             session.addTrigger("text", (session: ChatSession, socketData?: IWebData) => this.userText(session, socketData));
-            
+            session.addTrigger("closed", (session: ChatSession, socketData?: IWebData) => this.removeSession(session));
+
             await session.start ();
         }
     }
 
     async userText(session: ChatSession, socketData?: IWebData)
     {
-        console.log("Receive Text", socketData);
-
         if(!socketData) return;
         socketData.data.owner = session.userid;
         const target = socketData.data.target;
@@ -70,46 +67,82 @@ export class ChatSystem
 
     async send (userid: string, socketData?: IWebData)
     {
+        //console.log("Sending", socketData);
+
         const sessions = this.sessions.get(userid);
         if(!sessions) return;
 
-        /* const sessions = this.sessions.get(id);
-        if(!sessions) return; */
-
-        sessions?.map((session) => 
+        sessions?.forEach((session) => 
         {
             session.send(socketData);
+        });
+    }
+
+    async broadcast (socketData?: IWebData, except?: string[])
+    {
+        //console.log("broadcast", socketData);
+
+        this.sessions.forEach((sessions, key) => 
+        {
+            if(!except?.includes(key))
+            {
+                sessions?.forEach((session) => 
+                {
+                    session.send(socketData);
+                });
+            }
         });
     }
 
     async createSession (ws: Socket, userid : string)
     {
         const session = new ChatSession(ws, userid);
+
         if(!this.sessions.has(userid))
         {
             this.sessions.set(userid, [session]);
+            this.broadcast({type:"online-user", time:new Date(), data:{userid}}, [userid]);
         }
-        else this.sessions.get(userid)?.push(session);
+        else 
+        {
+            const sessions = this.sessions.get(userid)!;
+            sessions.push(session);
+            //console.log("Extra connection", sessions);
+        }
+
         this.users.set(session.id, userid);
+
+        const userList = Array.from(this.sessions.keys());
+        //console.log("Sending Userlist", userList);
+
+        this.send(userid, {type:"online-users", time:new Date(), data:{users:userList}});
+        
         return session;
     }
 
-    async removeSession (sessionid : string)
+    async removeSession (session : ChatSession)
     {
-        const userid = this.users.get(sessionid);
+        const userid = this.users.get(session.id);
         if(!userid) return;
 
-        this.users.delete(sessionid);
+        this.users.delete(session.id);
 
         if(this.sessions.has(userid))
         {
             const sessions = this.sessions.get(userid);
             if(!sessions) return;
-            const sindex = sessions.findIndex(session => session.id = sessionid);
+            const sindex = sessions.findIndex(session => session.id = session.id);
             if(sindex < 0) return;
             sessions.splice(sindex, 1);
-            if(sessions?.length) this.sessions.delete(userid)
+            
+            if(!sessions.length) 
+            {
+                this.sessions.delete(userid);
+                this.broadcast({type:"offline-user", time:new Date(), data:{userid:userid}});
+            }
         }
+
+        console.log(`\nUsuario desconectado!\nID: ${userid}\nSession: ${session.id}\nTime:${new Date()}\n`);
     }
 }
 

@@ -10,13 +10,16 @@ export function ChatOption ({user} : {user : IOther})
     {
         if(setSelectedOption)
         {
-            setSelectedOption(user);
+            setSelectedOption(user.id);
             /* console.log("Selected", setSelectedOption); */
         }
     }
 
+    const active = selectedOption == user.id? " active" : "";
+    const online = user.online? " online" : "";
+
     return (
-        <span className={selectedOption == user ? "ChatOption active" : "ChatOption"} onClick={selectUser}>
+        <span className={`ChatOption${active}${online}`} onClick={selectUser}>
             <Avatar src={user.avatar} />
             <span>{user.name}</span>
         </span>

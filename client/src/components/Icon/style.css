@@ -1,7 +1,61 @@
 .Icon {
-    cursor: default;
+    display: flex;
+    flex-shrink: 0;
+    object-fit: contain;
+    object-position: center;
+    -webkit-user-drag: none;
+    user-select: none;
+    box-sizing: border-box;
+    cursor: unset;
+    overflow: hidden;
 }
 
 .Icon.clickable {
     cursor: pointer;
+}
+
+.Icon > img {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
+    object-position: center;
+}
+
+.Icon > .icon {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.Icon > .icon {
+    background-color: var(--color-dark2);
+    -webkit-mask-clip: border-box;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-position: center;
+    -webkit-mask-origin: border-box;
+}
+
+.Icon > .icon.image {
+    background-repeat:no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-clip: border-box;
+    background-origin: border-box;
+}
+
+*:disabled .Icon > .icon {
+    background-color: gray;
+}
+
+button:hover .Icon > .icon {
+    background-color: var(--color-grow1);
+    transition: .3s;
 }

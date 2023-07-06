@@ -21,9 +21,7 @@ export function Header ()
     const userAvatar = useMemo(() => {
         if(!user) return null;
         return (
-            <Icon onClick={click}>
-                <Avatar src={user?.avatar}/>
-            </Icon>
+            <Avatar src={user?.avatar} onClick={click}/>
         )
     }, [user]);
 

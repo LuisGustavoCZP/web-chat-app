@@ -20,6 +20,9 @@
     gap: 10px;
     background-color: var(--color-light1);
     user-select: none;
+    height: 55px;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .ChatContent > .header > h4 {

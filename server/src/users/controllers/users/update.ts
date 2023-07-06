@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { APIResponse } from "../../../base";
 import { User } from "../../models";
 import { IUser } from "../../interfaces";
+import { chatSystem } from "../chat";
+import { setAuthCookie } from "../../services";
 
 export async function update (req : Request, res : Response)
 {
@@ -19,6 +21,10 @@ export async function update (req : Request, res : Response)
         if(userData.avatar) user.avatar = userData.avatar;
 
         const response = await user.save();
+
+        chatSystem.broadcast({type:"update-user", time:new Date(), data:{userid:id}});
+
+        const userInfo = setAuthCookie(user, res);
 
         return APIResponse.sucess(res, response, 200);
     }

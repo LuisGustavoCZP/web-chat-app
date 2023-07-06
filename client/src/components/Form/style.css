@@ -70,3 +70,12 @@
     border-color: var(--color-grow1);
     outline: 0;
 }
+
+.Form button:disabled {
+    filter:grayscale(100%);
+    filter:blur(100%);
+    filter:brightness(70%);
+    /* filter:saturate(100%); */
+    /* background-color: var(--color-dark0); */
+    pointer-events: none;
+}

@@ -10,7 +10,7 @@ export interface FormProps extends PropsWithChildren
     fail?: () => void;
 }
 
-export const Form = forwardRef<HTMLButtonElement, FormProps>(({children, submitButton="Enviar", callback, success, fail} : FormProps, ref : Ref<HTMLButtonElement>) =>
+export const Form = forwardRef<HTMLButtonElement, FormProps>(({children, submitButton="Enviar", callback, success, fail} : FormProps, ref? : Ref<HTMLButtonElement>) =>
 {
     const [messages, setMessages] = useState<string[]>([]);
 
@@ -21,8 +21,10 @@ export const Form = forwardRef<HTMLButtonElement, FormProps>(({children, submitB
 
         const target = e.target as HTMLFormElement;
         const formData = new FormData(target);
-        const objectData = Object.fromEntries(formData.entries())
-
+        
+        const entries = formData.entries();
+        const objectData = Object.fromEntries(entries);
+        
         const {data, messages} = await callback(objectData);
         
         if(!messages?.length)
