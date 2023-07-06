@@ -5,6 +5,7 @@ import "./style.css";
 import { useChatContext } from "../ChatHook";
 import { sendText } from "../../../services/chat";
 import { Icon } from "../../Icon";
+import sendIcon from "../../../assets/send-icon.svg";
 
 export function ChatControl ()
 {
@@ -50,7 +51,7 @@ export function ChatControl ()
     return (
         <div className="ChatControl">
             
-            <Form ref={formRef} callback={callback} submitButton={<Icon size={"2em"} src="./public/send-icon.svg" />}>
+            <Form ref={formRef} callback={callback} submitButton={<Icon size={"2em"} src={sendIcon} />}>
                 <textarea name="text" onKeyDown={onKeyDownText} style={{}}/>
             </Form>
         </div>
