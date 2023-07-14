@@ -29,7 +29,6 @@ jobs:
       uses: docker/build-push-action@v4.1.1
       with:
         context: ./client
-        file: ./client
         push: true
         tags: |
           luisgzanetti/web-chat-client:v1
