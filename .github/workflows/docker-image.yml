@@ -13,7 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
       
     - name: Docker Login
       uses: docker/login-action@v2.2.0
