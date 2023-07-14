@@ -29,6 +29,7 @@ jobs:
       uses: docker/build-push-action@v4.1.1
       with:
         context: ./client
+        file: ./client/Dockerfile
         push: true
         tags: |
           luisgzanetti/web-chat-client:v1
@@ -38,6 +39,7 @@ jobs:
       uses: docker/build-push-action@v4.1.1
       with:
         context: ./server
+        file: ./server/Dockerfile
         push: true
         tags: |
           luisgzanetti/web-chat-server:v1
